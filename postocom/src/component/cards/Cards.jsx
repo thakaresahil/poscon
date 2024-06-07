@@ -18,7 +18,7 @@ function Cards(props) {
       props.avgrating,
       props.description
     );
-  };
+  };  
 
   return (
     <div

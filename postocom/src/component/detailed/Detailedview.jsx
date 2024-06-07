@@ -34,7 +34,7 @@ function Detailedview({
       <div>
         <img src={img} alt="" />
       </div>
-      <div className="w-full flex flex-col gap-2 justify-around">
+      <div className="w-3/4  flex flex-col gap-2 ">
         <h1 className="text-3xl ">{name}</h1>
         <p className="text-2xl">{brand}</p>
         <div className="flex gap-2">

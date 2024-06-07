@@ -4,6 +4,7 @@ import Navbar from "./component/navbar/Navbar";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./component/signupin/Login";
+import Productbrowse from "./component/product/Productbrowse";
 
 function App() {
   const commonLayout = (component) => (
@@ -23,7 +24,11 @@ function App() {
       path: "/login",
       element: commonLayout(<Login/>),
     },
-
+    {
+      path: "/browseproduct",
+      element: commonLayout(<Productbrowse/>),
+    },
+    
   ]);
   return <RouterProvider router={router} />;
 }

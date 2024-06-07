@@ -1,0 +1,26 @@
+CREATE TABLE "men" (
+  "SERIAL NO" BIGSERIAL PRIMARY KEY,
+  "NAME" text,
+  "CATEGORY" text,
+  "DESCRIPTION & COLOR" text,
+  "FABRIC" text NULL,
+  "IMAGE" text,
+  "SIZE" text NULL,
+  "PRICE" bigint,
+  "PRODUCT ID" bigint,
+  "WEBSITE" text,
+  "PRODUCT URL" text
+);
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    full_name VARCHAR(255) NOT NULL,
+    mobile_number VARCHAR(15) NOT NULL UNIQUE,
+    email_id VARCHAR(255) NOT NULL UNIQUE,
+	password_hash TEXT NOT NULL,
+    gender VARCHAR(10),
+    date_of_birth DATE,
+    location VARCHAR(255),
+    alternate_mobile VARCHAR(15),
+    hint_name VARCHAR(255)
+);

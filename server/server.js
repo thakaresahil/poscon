@@ -86,6 +86,28 @@ app.get("/home/bestseller", async (req, res) => {
   }
 });
 
+app.get("/browseproducts/women", async (req, res) => {
+  try {
+    const products = await db.query("SELECT * FROM mytable ORDER BY RANDOM() LIMIT 36");
+    return res.json(products.rows).end();
+    
+  } catch (error) {
+    console.error(error);
+    return res.json({ error: "Internal Server Error" });
+  }
+})
+
+app.get("/browseproducts/:men", async (req, res) => {
+  try {
+    const products = await db.query("SELECT * FROM men ORDER BY RANDOM() LIMIT 36");
+    return res.json(products.rows).end();
+    
+  } catch (error) {
+    console.error(error);
+    return res.json({ error: "Internal Server Error" });
+  }
+})
+
 app.post("/signup/user", async (req, res) => {
   const { mobile_number, email, password } = req.body;
   const hashPassword = await bcrypt.hash(password, saltRounds);
