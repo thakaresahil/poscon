@@ -1,33 +1,63 @@
-Overview
-This project is a full-featured E-Commerce Website designed to provide a seamless online shopping experience. It includes a PostgreSQL database schema for storing user and product information, and a full-stack application to manage user interactions, product listings, and secure transactions. The project ensures the security of sensitive data by implementing password hashing and unique constraints on key fields like email and mobile number.
 
-Features
-User Registration and Authentication: Secure sign-up and login with hashed passwords.
-Product Listings: Browse and search through a wide variety of products.
-Shopping Cart: Add products to the cart and manage quantities.
-Checkout Process: Secure checkout with order summary and payment processing.
-User Profile Management: View and edit personal details and order history.
-Responsive Design: Front-end built with React and Tailwind CSS for a smooth experience across devices.
+# Poscon
 
-Technologies Used
-Front-end: React, Tailwind CSS
-Back-end: Node.js, Express
-Database: PostgreSQL
-Authentication: bcrypt for password hashing
+ This project is a full-featured E-Commerce Website designed to provide a seamless online shopping experience. It includes a PostgreSQL database schema for storing user and product information, and a full-stack application to manage user interactions, product listings, and secure transactions. The project ensures the security of sensitive data by implementing password hashing and unique constraints on key fields like email and mobile number.
 
-Getting Started
-Prerequisites
-Node.js and npm installed
-PostgreSQL installed and running
-Installation
+## More about CRUD
 
-Clone the repository:
-git clone https://github.com/yourusername/ecommerce-website.git
-cd ecommerce-website
+* CRUD refers to the four functions that are considered necessary to implement a persistent storage application: create, read, update and delete.
+* CRUD acronym identifies all of the major functions that are inherent to databases.
+## Technology Used
 
-Install dependencies:
-npm install
+**Client:** React, TailwindCSS
+
+**Server:** Node, Express
+
+**Database:** ProstgreSQL
+
+## Getting Started
+
+Prerequisites Node.js and npm installed PostgreSQL installed and running Installation
+
+To clone this repository
+
+```bash
+  git clone https://github.com/thakaresahil/poscon.git
+```
+
+```bash
+  cd poscon
+```
+
+## Install dependencies
+
+```bash
+  npm install
+```
+## License
+
+License This project is licensed under the MIT License.
 
 
-License
-This project is licensed under the MIT License. See the LICENSE file for more details.
+## Endpoints
+
+### Front-End
+
+| HTTP Methode | URL     | Description                |
+| :-------- | :------- | :------------------------- |
+| `get` | `http://localhost:3000/` | Home Page |
+| `get` | `http://localhost:3000/browseproduct` | Browse Products |
+
+### Back-End Server
+
+| HTTP Methode | URL     | Description                |
+| :-------- | :------- | :------------------------- |
+| `get` | `http://localhost:9000/data` | get product data |
+| `get` | `http://localhost:9000/home/bestseller` | get the bestseller |
+| `get` | `http://localhost:9000/browseproducts/women` | women products |
+| `get` | `http://localhost:9000/browseproducts/men` | men products |
+| `get` | `http://localhost:9000/browseproducts/access` | Retrieve Accessories |
+| `get` | `http://localhost:9000/browseproducts/newarrivals` | Retrieve New Arrivals |
+| `post` | `http://localhost:9000/signup/user` | user registration |
+| `post` | `http://localhost:9000/login` | user login |
+

@@ -32,7 +32,7 @@ function Navbar() {
       <div className="container mx-auto flex justify-between items-center gap-6 m-4">
         <h1 className="text-xl font-bold">PosCon</h1>
         <div className="hidden md:flex justify-around items-center gap-6">
-          <p>Home</p>
+          <NavLink to="/">Home</NavLink>
           <p>Contact</p>
           <p>About</p>
 

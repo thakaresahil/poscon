@@ -88,38 +88,77 @@ app.get("/home/bestseller", async (req, res) => {
 
 app.get("/browseproducts/women", async (req, res) => {
   try {
-    const products = await db.query("SELECT * FROM mytable ORDER BY RANDOM() LIMIT 36");
+    const products = await db.query(
+      "SELECT * FROM mytable ORDER BY RANDOM() LIMIT 36"
+    );
     return res.json(products.rows).end();
-    
   } catch (error) {
     console.error(error);
     return res.json({ error: "Internal Server Error" });
   }
-})
+});
 
-app.get("/browseproducts/:men", async (req, res) => {
+app.get("/browseproducts/newarrivals", async (req, res) => {
   try {
-    const products = await db.query("SELECT * FROM men ORDER BY RANDOM() LIMIT 36");
+    const products = await db.query("SELECT * FROM mytable LIMIT 36");
     return res.json(products.rows).end();
-    
   } catch (error) {
     console.error(error);
     return res.json({ error: "Internal Server Error" });
   }
-})
+});
+
+app.get("/browseproducts/men", async (req, res) => {
+  try {
+    const products = await db.query(
+      "SELECT * FROM men WHERE CATEGORY != 'accessories' ORDER BY RANDOM() LIMIT 36"
+    );
+    return res.json(products.rows).end();
+  } catch (error) {
+    console.error(error);
+    return res.json({ error: "Internal Server Error" });
+  }
+});
+
+app.get("/browseproducts/access", async (req, res) => {
+  const access = req.params.access;
+  try {
+    const products = await db.query(
+      "SELECT * FROM men WHERE category = 'accessories' ORDER BY RANDOM() LIMIT 36"
+    );
+    return res.json(products.rows).end();
+  } catch (error) {
+    console.error(error);
+    return res.json({ error: "Internal Server Error" });
+  }
+});
 
 app.post("/signup/user", async (req, res) => {
-  const { mobile_number, email, password } = req.body;
-  const hashPassword = await bcrypt.hash(password, saltRounds);
+  const phonenumber = req.body.phonenumber;
+  const email = req.body.email;
+  const password = req.body.password;
+
+  //const hashPassword = await bcrypt.hash(password, saltRounds);
+
   try {
-    const result = await db.query(
-      "INSERT INTO users (mobile_number, email_id, password_hash) VALUES ($1, $2, $3) RETURNING *",
-      [mobile_number, email, hashPassword]
-    );
-    const user = result.rows[0];
-    res.status(201), json(user);
+    const isUser = await db.query("SELECT * FROM users WHERE email_id = $1", [
+      email,
+    ]);
+
+    if (isUser.rowCount > 0) {
+      console.log("User already exists");
+      return res.json({ error: "User already exists" });
+    } else {
+      const result = await db.query(
+        "INSERT INTO usersdata (mobilenumber, emailid, passwordhash) VALUES ($1, $2, $3) RETURNING *",
+        [phonenumber, email, password]
+      );
+      console.log(result);
+      const user = result.rows[0];
+      res.status(201).json(user);
+    }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

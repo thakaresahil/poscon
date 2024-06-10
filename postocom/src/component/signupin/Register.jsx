@@ -47,7 +47,7 @@ function Register({ open, handleClose, handleLoginComponent}) {
 
     if (signupdata.password === signupdata.confirm_password) {
       axios
-        .post("http://localhost:9000/register", signupdata, {
+        .post("http://localhost:9000/signup/user", signupdata, {
           headers: {
             "Content-Type": "application/json",
           },
@@ -61,9 +61,6 @@ function Register({ open, handleClose, handleLoginComponent}) {
               setRedirecttologin("Already Signup, Please Login!");
             } else {
               console.log("registration successfull");
-              localStorage.setItem("id", result.id);
-              localStorage.setItem("email", result.email);
-              localStorage.setItem("password", result.password);
               navigate("/");
             }
           } catch (error) {

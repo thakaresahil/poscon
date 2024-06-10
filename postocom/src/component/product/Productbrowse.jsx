@@ -8,6 +8,11 @@ function Productbrowse() {
   const [filterCategory, setFilterCategory] = useState("");
   const [productData, setProductData] = useState([]);
   const [view, setView] = useState(null);
+  const [cart, setCart] = useState(() => {
+    // Load cart from local storage if available
+    const savedCart = localStorage.getItem("cart");
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
   const [viewData, setViewData] = useState({
     id: "",
     img: "",
@@ -34,6 +39,10 @@ function Productbrowse() {
   useEffect(() => {
     fetchProductData(gender);
   }, [gender]);
+  useEffect(() => {
+    // Save cart to local storage whenever it changes
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
 
   const handleViewDetails = (id, img, name, orgprice, colour, brand, ratingcount, avgrating, description) => {
     setView(id);
@@ -53,6 +62,14 @@ function Productbrowse() {
   const handleGenderChange = (event) => {
     setGender(event.target.value);
   };
+  const handleAddToCart = (item, count) => {
+    setCart((prevCart) => {
+      const newCart = [...prevCart, { ...item, quantity: count }];
+      // Save new cart to local storage
+      localStorage.setItem("cart", JSON.stringify(newCart));
+      return newCart;
+    });
+  };
 
   const handleDropdownChange = (event) => {
     setFilterCategory(event.target.value);
@@ -65,8 +82,8 @@ function Productbrowse() {
           <h2 className="text-3xl">Product Category</h2>
           <button onClick={handleGenderChange} value="men">Men</button>
           <button onClick={handleGenderChange} value="women">Women</button>
-          <button>Accessories</button>
-          <button>New Arrivals</button>
+          <button onClick={handleGenderChange} value="access">Accessories</button>
+          <button onClick={handleGenderChange} value="newarrivals">New Arrivals</button>
         </div>
       ) : null}
 
@@ -120,6 +137,7 @@ function Productbrowse() {
                 ratingcount={viewData.ratingcount}
                 avgrating={viewData.avgrating}
                 description={viewData.description}
+                onAddToCart={handleAddToCart}
               />
             )}
           </div>
