@@ -5,14 +5,13 @@ import { Dialog } from "@mui/material";
 
 function Login({ open, handleClose, handleRegister }) {
   const navigate = useNavigate();
-  const localcheck = localStorage.getItem("email");
+  const localcheck = localStorage.getItem("token");
   useEffect(() => {
     if (localcheck) {
-      navigate("/");
+      handleClose();
     }
-  }, [localcheck, navigate]);
+  }, [localcheck, handleClose]);
 
-  const weretoNavigate = "/profile";
   const [logindata, setData] = useState({
     email: "",
     password: "",
@@ -47,6 +46,11 @@ function Login({ open, handleClose, handleRegister }) {
           if (result.error) {
             setFormError(result.error);
           }
+          else{
+            localStorage.setItem("uid", result.uid);
+            localStorage.setItem("token", result.token);
+            handleClose();
+          }
           // if (neednavigate === "signup") {
           //   console.log(result);
           //   setRedirecttosignup("Account Not Found, Please Signup!");
@@ -68,26 +72,8 @@ function Login({ open, handleClose, handleRegister }) {
     setRedirecttosignup("");
     setWrongPassword("");
     // console.log(logindata);
-    if (localStorage.getItem("email") !== null) {
-      if (
-        localStorage.getItem("email") === logindata.email &&
-        localStorage.getItem("password") === logindata.password
-      ) {
-        console.log("You have successfully logged in!");
-        navigate(weretoNavigate);
-        onclose();
-      } else if (
-        localStorage.getItem("password") !== logindata.password &&
-        localStorage.getItem("email") === logindata.email
-      ) {
-        setWrongPassword("Incorrect Password");
-      }
-      // else if(localStorage.getItem("email") !== logindata.email){
-      //   setWrongPassword("Incorrect Email")
-      // }
-      else {
-        loggerin();
-      }
+    if (localStorage.getItem("token") !== null){
+      handleClose();
     } else {
       loggerin();
     }

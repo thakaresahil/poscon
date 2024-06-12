@@ -1,6 +1,12 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function Dayweek() {
+  const navigate = useNavigate();
+
+  const handleShop = () =>{
+    navigate("/browseproduct");
+  }
   return (
     <div className="bg-slate-200">
       <div className="container mx-auto flex flex-col lg:flex-row  justify-around items-center px-8  my-12">
@@ -32,7 +38,7 @@ function Dayweek() {
               <p>Sec</p>
             </div>
           </div>
-          <button className="px-6 py-2 bg-black  text-white rounded-md transition-transform duration-300 hover:scale-105">
+          <button className="px-6 py-2 bg-black  text-white rounded-md transition-transform duration-300 hover:scale-105" onClick={handleShop}>
             Shop Now
           </button>
         </div>

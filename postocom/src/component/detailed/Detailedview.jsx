@@ -5,16 +5,14 @@ function Detailedview({
   id,
   img,
   name,
-  orgprice = 0,
-  colour,
-  brand,
-  ratingcount,
-  avgrating,
+  orgprice,
+  sellprice,
   description,
+  discPercents,
   onAddToCart,
 }) {
   const [count, setCount] = useState(1);
-
+  // console.log(description);
   const increment = () => {
     setCount((prevCount) => prevCount + 1);
   };
@@ -23,11 +21,8 @@ function Detailedview({
     setCount((prevCount) => (prevCount > 1 ? prevCount - 1 : 1));
   };
 
-  const discountedPrice = (orgprice * 0.67).toFixed(2);
-
   const handleAddToCartClick = () => {
-    const item = { id, img, name, orgprice, colour, brand, ratingcount, avgrating, description };
-    onAddToCart(item, count);
+    onAddToCart(id,count);
   };
 
   return (
@@ -37,20 +32,21 @@ function Detailedview({
       </div>
       <div className="w-3/4 flex flex-col gap-2">
         <h1 className="text-3xl">{name}</h1>
-        <p className="text-2xl">{brand}</p>
-        <div className="flex gap-2">
-          <p>Rating: {ratingcount}</p>
-          <p>{avgrating}</p>
-        </div>
+
         <p>{description}</p>
-        <p>{colour}</p>
         <div className="flex w-full justify-center items-center bg-gray-100 p-2 rounded-lg">
           <FaTruck />
           <p>FREE DELIVERY</p>
         </div>
-        <p className="text-gray-300 line-through">${orgprice.toFixed(2)}</p>
-        <p>At ${discountedPrice}</p>
-
+        <div className="flex justify-start gap-4">
+          <p className="text-gray-300 line-through">${orgprice}</p>
+          <p className="font-semibold ">
+            At ${sellprice}
+            <span className="text-base text-red-300">
+              ({discPercents}% OFF)
+            </span>
+          </p>
+        </div>
         <div className="flex justify-between items-center">
           <p>Quantity</p>
           <div className="flex justify-center items-center border">
@@ -62,7 +58,10 @@ function Detailedview({
               +
             </button>
           </div>
-          <button onClick={handleAddToCartClick} className="bg-red-500 p-2 px-4 rounded-md text-white">
+          <button
+            onClick={handleAddToCartClick}
+            className="bg-red-500 p-2 px-4 rounded-md text-white"
+          >
             ADD TO CART
           </button>
         </div>

@@ -19,8 +19,8 @@ function Register({ open, handleClose, handleLoginComponent}) {
 
   const [signupdata, setData] = useState({
     email: "",
-    phonenumber: "",
-    password: "",
+    pnum: "",
+    passhash: "",
     confirm_password: "",
   });
 
@@ -61,7 +61,7 @@ function Register({ open, handleClose, handleLoginComponent}) {
               setRedirecttologin("Already Signup, Please Login!");
             } else {
               console.log("registration successfull");
-              navigate("/");
+              handleLoginComponent();
             }
           } catch (error) {
             console.error("Error parsing JSON:", error);
@@ -99,20 +99,20 @@ function Register({ open, handleClose, handleLoginComponent}) {
           <input
             type="text"
             className="block border border-grey-light w-full p-3 rounded mb-4 hover:shadow-lg font-medium transition transform hover:-translate-y-0.5"
-            name="phonenumber"
+            name="pnum"
             placeholder="Phone Number"
             onChange={handlechange}
-            value={signupdata.phonenumber}
+            value={signupdata.pnum}
             required
           />
           <div className="flex gap-4">
             <input
               type="password"
               className="block border border-grey-light w-full p-3 rounded mb-4 hover:shadow-lg font-medium transition transform hover:-translate-y-0.5"
-              name="password"
+              name="passhash"
               placeholder="Password"
               onChange={handlechange}
-              value={signupdata.password}
+              value={signupdata.passhash}
               required
             />
             <input

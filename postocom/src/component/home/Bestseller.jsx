@@ -13,10 +13,7 @@ function Bestseller() {
     img: "",
     name: "",
     orgprice: "",
-    color: "",
-    brand: "",
-    ratingcount: "",
-    avgrating: "",
+    sellprice: "",
     description: "",
   });
 
@@ -39,10 +36,7 @@ function Bestseller() {
     img,
     name,
     orgprice,
-    colour,
-    brand,
-    ratingcount,
-    avgrating,
+    sellprice,
     description
   ) => {
     setView(id);
@@ -51,10 +45,7 @@ function Bestseller() {
       img,
       name,
       orgprice,
-      color: colour,
-      brand,
-      ratingcount,
-      avgrating,
+      sellprice,
       description,
     });
   };
@@ -72,15 +63,12 @@ function Bestseller() {
           bsell.length > 0 ? (
             bsell.map((newItem) => (
               <Cards
-                key={newItem.field1}
-                id={newItem.field1}
+                key={newItem.id}
+                id={newItem.id}
                 img={newItem.img}
                 name={newItem.name}
                 orgprice={newItem.price}
-                colour={newItem.colour}
-                brand={newItem.brand}
-                ratingcount={newItem.ratingcount}
-                avgrating={newItem.avg_rating}
+                sellprice={newItem.sellprice}
                 description={newItem.description}
                 onViewDetails={handleViewDetails}
               />
@@ -95,10 +83,7 @@ function Bestseller() {
             img={viewData.img}
             name={viewData.name}
             orgprice={viewData.orgprice}
-            colour={viewData.color}
-            brand={viewData.brand}
-            ratingcount={viewData.ratingcount}
-            avgrating={viewData.avgrating}
+            sellprice={viewData.sellprice}
             description={viewData.description}
           />
         )}

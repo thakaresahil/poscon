@@ -1,15 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Profile from "./Profile";
 import Cart from "./Cart";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import Login from "../signupin/Login";
 import Register from "../signupin/Register";
 
 function Navbar() {
+  const navigate = useNavigate();
   const [logIn, setLogIn] = useState(false);
   const [register, setRegister] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [loginstatus, setLogInstatus] = useState(false);
+  const localcheck = localStorage.getItem("token");
 
+  useEffect(() => {
+    if (localcheck) {
+      setLogInstatus(true);
+    }
+  }, [localcheck]);
   const handleformsearch = () => {
     console.log("handleFormsearch");
   };
@@ -22,6 +30,10 @@ function Navbar() {
     setRegister(false);
   };
 
+  const handleProfile = () => {
+    navigate("/profile");
+  }
+
   const handleregister = () => {
     setLogIn(false);
     setRegister(true);
@@ -30,13 +42,14 @@ function Navbar() {
   return (
     <div className="static">
       <div className="container mx-auto flex justify-between items-center gap-6 m-4">
-        <h1 className="text-xl font-bold">PosCon</h1>
+        <NavLink to="/" className="text-xl font-bold">PosCon</NavLink>
         <div className="hidden md:flex justify-around items-center gap-6">
           <NavLink to="/">Home</NavLink>
-          <p>Contact</p>
-          <p>About</p>
-
-          <button onClick={handleLoginComponent}>Log In</button>
+          <NavLink to="/contact">Contact</NavLink>
+          <NavLink to="/about">About</NavLink>
+          {!loginstatus ? (
+            <button onClick={handleLoginComponent}>Log In</button>
+          ) : null}
         </div>
         <div className="flex justify-end items-center gap-2">
           <div className="flex justify-around items-center gap-4">
@@ -67,13 +80,15 @@ function Navbar() {
               </button>
             </form>
             {/* cart */}
-            <div className="hidden md:block">
+            <NavLink to="/cart" className="hidden md:block">
               <Cart />
-            </div>
+            </NavLink>
             {/* profile hidden on small screens */}
-            <div className="hidden md:block">
-              <Profile />
-            </div>
+            {loginstatus ? (
+              <button className="hidden md:block" onClick={handleProfile}>
+                <Profile />
+              </button>
+            ) : null}
           </div>
           <div className="relative md:hidden">
             <button
@@ -106,12 +121,12 @@ function Navbar() {
                 {/* Optional: Add your Cart component here */}
 
                 <ul className="py-1">
-                  <li>
+                  <NavLink to="/cart">
                     <Cart />
-                  </li>
+                  </NavLink>
                   <li>
                     <NavLink
-                      to="#"
+                      to="/"
                       className="block py-2 px-4 text-gray-900 rounded hover:bg-gray-100"
                     >
                       Home
@@ -119,7 +134,7 @@ function Navbar() {
                   </li>
                   <li>
                     <NavLink
-                      to="#"
+                      to="/contact"
                       className="block py-2 px-4 text-gray-900 rounded hover:bg-gray-100"
                     >
                       Contact
@@ -127,28 +142,32 @@ function Navbar() {
                   </li>
                   <li>
                     <NavLink
-                      to="#"
+                      to="/about"
                       className="block py-2 px-4 text-gray-900 rounded hover:bg-gray-100"
                     >
                       About
                     </NavLink>
                   </li>
-                  <li>
-                    <NavLink
-                      to="/login"
-                      className="block py-2 px-4 text-gray-900 rounded hover:bg-gray-100"
-                    >
-                      Log in
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="#"
-                      className="block py-2 px-4 text-gray-900 rounded hover:bg-gray-100"
-                    >
-                      Profile
-                    </NavLink>
-                  </li>
+                  {!loginstatus ? (
+                    <li>
+                      <button
+                        onClick={handleLoginComponent}
+                        className="block py-2 px-4 text-gray-900 rounded hover:bg-gray-100"
+                      >
+                        Log in
+                      </button>
+                    </li>
+                  ) : null}
+                  {loginstatus ? (
+                    <li>
+                      <button
+                        className="block py-2 px-4 text-gray-900 rounded hover:bg-gray-100"
+                      onClick={handleProfile}
+                      >
+                        Profile
+                      </button>
+                    </li>
+                  ) : null}
                 </ul>
               </div>
             )}

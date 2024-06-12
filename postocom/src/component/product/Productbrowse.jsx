@@ -1,28 +1,25 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Cards from "../cards/Cards";
+import { useNavigate } from "react-router-dom";
 import Detailedview from "../detailed/Detailedview";
 
 function Productbrowse() {
+  const navigate = useNavigate();
   const [gender, setGender] = useState("women");
   const [filterCategory, setFilterCategory] = useState("");
   const [productData, setProductData] = useState([]);
   const [view, setView] = useState(null);
-  const [cart, setCart] = useState(() => {
-    // Load cart from local storage if available
-    const savedCart = localStorage.getItem("cart");
-    return savedCart ? JSON.parse(savedCart) : [];
-  });
+  const uidcheck = localStorage.getItem("uid");
+  const tokencheck = localStorage.getItem("token");
   const [viewData, setViewData] = useState({
     id: "",
     img: "",
     name: "",
     orgprice: "",
-    color: "",
-    brand: "",
-    ratingcount: "",
-    avgrating: "",
+    sellprice: "",
     description: "",
+    discPercents: "",
   });
 
   const fetchProductData = async (gender) => {
@@ -39,36 +36,67 @@ function Productbrowse() {
   useEffect(() => {
     fetchProductData(gender);
   }, [gender]);
-  useEffect(() => {
-    // Save cart to local storage whenever it changes
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
+ 
 
-  const handleViewDetails = (id, img, name, orgprice, colour, brand, ratingcount, avgrating, description) => {
+  const handleViewDetails = (
+    id,
+    img,
+    name,
+    orgprice,
+    sellprice,
+    description,
+    discPercents
+  ) => {
     setView(id);
     setViewData({
       id,
       img,
       name,
       orgprice,
-      color: colour,
-      brand,
-      ratingcount,
-      avgrating,
+      sellprice,
       description,
+      discPercents,
     });
   };
 
   const handleGenderChange = (event) => {
     setGender(event.target.value);
   };
-  const handleAddToCart = (item, count) => {
-    setCart((prevCart) => {
-      const newCart = [...prevCart, { ...item, quantity: count }];
-      // Save new cart to local storage
-      localStorage.setItem("cart", JSON.stringify(newCart));
-      return newCart;
-    });
+
+  const addtocart = async (cart) => {
+    try {
+      await axios.post(
+        `http://localhost:9000/addtocart`,
+        cart,
+        { headers: { "Content-Type": "application/json" } }
+      ).then((response) => {
+        try {
+          const result = response.data;
+          console.log(result);
+          navigate("/cart");
+        } catch (error) {
+          console.error("Error parsing JSON:", error);
+        }
+      })
+      ;
+
+    } catch (error) {
+      console.error("Error Fetching Data: " + error);
+    }
+  };
+
+  const handleAddToCart = (id, count) => {
+    if (!uidcheck) {
+      navigate("/");
+    }
+    
+    const newCartItem = {
+      uid: uidcheck,
+      pid: id,
+      count: count,
+      token: tokencheck,
+    };
+    addtocart(newCartItem);
   };
 
   const handleDropdownChange = (event) => {
@@ -80,10 +108,18 @@ function Productbrowse() {
       {view === null ? (
         <div className="flex flex-col justify-start items-start w-96 my-20 gap-4">
           <h2 className="text-3xl">Product Category</h2>
-          <button onClick={handleGenderChange} value="men">Men</button>
-          <button onClick={handleGenderChange} value="women">Women</button>
-          <button onClick={handleGenderChange} value="access">Accessories</button>
-          <button onClick={handleGenderChange} value="newarrivals">New Arrivals</button>
+          <button onClick={handleGenderChange} value="men">
+            Men
+          </button>
+          <button onClick={handleGenderChange} value="women">
+            Women
+          </button>
+          <button onClick={handleGenderChange} value="access">
+            Accessories
+          </button>
+          <button onClick={handleGenderChange} value="newarrivals">
+            New Arrivals
+          </button>
         </div>
       ) : null}
 
@@ -105,23 +141,20 @@ function Productbrowse() {
         <hr />
         <div>
           <div className="flex flex-wrap justify-around items-center gap-6">
-            {productData.length > 0 && view === null && (
+            {productData.length > 0 &&
+              view === null &&
               productData.map((productItem) => (
                 <Cards
-                  key={productItem.field1}
-                  id={productItem.field1}
+                  key={productItem.id}
+                  id={productItem.id}
                   img={productItem.img}
-                  name={productItem.name}
+                  name={productItem.namee}
                   orgprice={productItem.price}
-                  colour={productItem.colour}
-                  brand={productItem.brand}
-                  ratingcount={productItem.ratingcount}
-                  avgrating={productItem.avg_rating}
+                  sellprice={productItem.sellprice}
                   description={productItem.description}
                   onViewDetails={handleViewDetails}
                 />
-              ))
-            )}
+              ))}
           </div>
 
           <div>
@@ -132,11 +165,9 @@ function Productbrowse() {
                 img={viewData.img}
                 name={viewData.name}
                 orgprice={viewData.orgprice}
-                colour={viewData.color}
-                brand={viewData.brand}
-                ratingcount={viewData.ratingcount}
-                avgrating={viewData.avgrating}
+                sellprice={viewData.sellprice}
                 description={viewData.description}
+                discPercents={viewData.discPercents}
                 onAddToCart={handleAddToCart}
               />
             )}

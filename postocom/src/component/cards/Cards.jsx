@@ -2,21 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 function Cards(props) {
-  const discountedPrice = (props.orgprice * 0.67).toFixed(2);
+ 
   const truncatedName =
     props.name.length > 50 ? props.name.substring(0, 48) + "..." : props.name;
 
+    const discPercents = Math.floor(((props.orgprice - props.sellprice) / props.orgprice) * 100);
   const handleView = () => {
     props.onViewDetails(
       props.id,
       props.img,
       props.name,
       props.orgprice,
-      props.colour,
-      props.brand,
-      props.ratingcount,
-      props.avgrating,
-      props.description
+      props.sellprice,
+      props.description,
+      discPercents
     );
   };  
 
@@ -28,8 +27,9 @@ function Cards(props) {
       <img className="w-52" src={props.img} alt="Productimg" />
       <p className="w-full text-center">{truncatedName}</p>
       <p>
-        At <span className="text-red-500">₹{discountedPrice}</span>{' '}
-        <span className="text-gray-300 line-through">₹{props.orgprice}</span>
+         <span className="font-semibold ">At ₹{props.sellprice}</span>{' '}
+        <span className="text-gray-300 line-through font-thin text-sm">₹{props.orgprice}</span>
+        <span className="text-red-400 ">({discPercents}% OFF)</span>
       </p>
     </div>
   );
@@ -40,11 +40,7 @@ Cards.propTypes = {
   img: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   orgprice: PropTypes.number.isRequired,
-  colour: PropTypes.string,
-  brand: PropTypes.string,
-  ratingcount: PropTypes.number,
-  avgrating: PropTypes.number,
-  description: PropTypes.string,
+  description: PropTypes.string.isRequired,
   onViewDetails: PropTypes.func.isRequired,
 };
 

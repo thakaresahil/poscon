@@ -8,7 +8,7 @@ import multer from "multer";
 import fs from "fs";
 import util from "util";
 import bcrypt from "bcrypt";
-import { generateToken, verifyToken } from "./auth.js";
+import jwt from "jsonwebtoken";
 
 const app = express();
 const port = 9000;
@@ -21,6 +21,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.static("public"));
+const secretKey = process.env.SESSION_SECRET;
 
 const db = new pg.Client({
   user: process.env.PG_USER,
@@ -54,8 +55,20 @@ async function deleteFile(filePath) {
   }
 }
 
+const generateToken = (user) => {
+  return jwt.sign({ id: user.id }, secretKey, { expiresIn: "30d" });
+};
+
+const verifyToken = (token) => {
+  try {
+    return jwt.verify(token, secretKey);
+  } catch (err) {
+    return null;
+  }
+};
+
 const authenticateToken = (req, res, next) => {
-  const token = req.headers["authorization"];
+  const token = req.body.token;
   if (!token) return res.sendStatus(401);
 
   const verifiedUser = verifyToken(token);
@@ -67,7 +80,7 @@ const authenticateToken = (req, res, next) => {
 
 app.get("/data", async (req, res) => {
   try {
-    const dataretrive = await db.query("SELECT * FROM mytable LIMIT 8");
+    const dataretrive = await db.query("SELECT * FROM products LIMIT 8");
     return res.json(dataretrive.rows).end();
     // console.log(dataretrive);
   } catch (err) {
@@ -89,7 +102,7 @@ app.get("/home/bestseller", async (req, res) => {
 app.get("/browseproducts/women", async (req, res) => {
   try {
     const products = await db.query(
-      "SELECT * FROM mytable ORDER BY RANDOM() LIMIT 36"
+      "SELECT * FROM products WHERE gender = 'women' ORDER BY RANDOM() LIMIT 36"
     );
     return res.json(products.rows).end();
   } catch (error) {
@@ -100,7 +113,7 @@ app.get("/browseproducts/women", async (req, res) => {
 
 app.get("/browseproducts/newarrivals", async (req, res) => {
   try {
-    const products = await db.query("SELECT * FROM mytable LIMIT 36");
+    const products = await db.query("SELECT * FROM products LIMIT 36");
     return res.json(products.rows).end();
   } catch (error) {
     console.error(error);
@@ -111,7 +124,7 @@ app.get("/browseproducts/newarrivals", async (req, res) => {
 app.get("/browseproducts/men", async (req, res) => {
   try {
     const products = await db.query(
-      "SELECT * FROM men WHERE CATEGORY != 'accessories' ORDER BY RANDOM() LIMIT 36"
+      "SELECT * FROM products WHERE gender = 'men' and category !='accessories' ORDER BY RANDOM() LIMIT 36"
     );
     return res.json(products.rows).end();
   } catch (error) {
@@ -121,12 +134,71 @@ app.get("/browseproducts/men", async (req, res) => {
 });
 
 app.get("/browseproducts/access", async (req, res) => {
-  const access = req.params.access;
   try {
     const products = await db.query(
-      "SELECT * FROM men WHERE category = 'accessories' ORDER BY RANDOM() LIMIT 36"
+      "SELECT * FROM products WHERE category = 'accessories' ORDER BY RANDOM() LIMIT 36"
     );
     return res.json(products.rows).end();
+  } catch (error) {
+    console.error(error);
+    return res.json({ error: "Internal Server Error" });
+  }
+});
+
+app.get("/profile/:uid", async (req, res) => {
+  const uid = req.params.uid;
+  try {
+    const udata = await db.query("SELECT * FROM users WHERE id = $1", [uid]);
+    // console.log(udata);
+    return res.json(udata.rows[0]).end();
+  } catch (error) {
+    console.error(error);
+    return res.json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/cartdata", authenticateToken, async (req, res) => {
+  const cart = req.body.uid;
+  try {
+    // const cartdata = await db.query("SELECT product_id FROM cart WHERE user_id = $1", [cart]);
+    // const cartitems = [];
+    // console.log(cartdata.rows);
+    // for(const row of cartdata.rows) {
+    //   const pid = row.product_id;
+    //   const response = await db.query("SELECT * FROM products WHERE id = $1",[pid]);
+    // cartitems.push(response.rows[0]);
+    // }
+    const cartdataa = await db.query(
+      "SELECT * FROM cart INNER JOIN products on cart.product_id = products.id WHERE user_id = $1 and status = 0",
+      [cart]
+    );
+
+    return res.json(cartdataa.rows).end();
+  } catch (error) {
+    console.error(error);
+    return res.json({ error: "Internal Server Error" });
+  }
+});
+
+app.patch("/buyitem", authenticateToken, async (req, res) => {
+  const { pid, uid } = req.body;
+  console.log(pid, uid);
+  // Ensure pid is an array and not empty
+  if (!Array.isArray(pid) || pid.length === 0) {
+    return res.status(400).json({ error: "Invalid product IDs" });
+  }
+  try {
+    const result = await db.query(`UPDATE cart SET status = 1 WHERE user_id = $1 AND product_id = ANY($2::int[])`,
+      [uid, pid]
+    );
+
+    if(result.rowCount>0){
+      return res.json({status: "buyed"})
+    }
+    else{
+      return res.status(404).json({error: "Cart is empty"})
+    }
+
   } catch (error) {
     console.error(error);
     return res.json({ error: "Internal Server Error" });
@@ -138,10 +210,10 @@ app.post("/signup/user", async (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  //const hashPassword = await bcrypt.hash(password, saltRounds);
+  const hashPassword = await bcrypt.hash(password, saltRounds);
 
   try {
-    const isUser = await db.query("SELECT * FROM users WHERE email_id = $1", [
+    const isUser = await db.query("SELECT * FROM users WHERE email = $1", [
       email,
     ]);
 
@@ -150,8 +222,8 @@ app.post("/signup/user", async (req, res) => {
       return res.json({ error: "User already exists" });
     } else {
       const result = await db.query(
-        "INSERT INTO usersdata (mobilenumber, emailid, passwordhash) VALUES ($1, $2, $3) RETURNING *",
-        [phonenumber, email, password]
+        "INSERT INTO users (pnum, email, passhash) VALUES ($1, $2, $3) RETURNING *",
+        [phonenumber, email, hashPassword]
       );
       console.log(result);
       const user = result.rows[0];
@@ -162,16 +234,32 @@ app.post("/signup/user", async (req, res) => {
   }
 });
 
+app.post("/addtocart", authenticateToken, async (req, res) => {
+  const uid = req.body.uid;
+  const pid = req.body.pid;
+  const count = req.body.count;
+  try {
+    await db.query(
+      "INSERT INTO cart (user_id, product_id, quantity) VALUES ($1, $2, $3)",
+      [uid, pid, count]
+    );
+    return res.status(201).json({ status: "Added" });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
-    const result = await db.query("SELECT * FROM users WHERE email_id = $1", [
+    const result = await db.query("SELECT * FROM users WHERE email = $1", [
       email,
     ]);
     const user = result.rows[0];
-    if (user && (await bcrypt.compare(password, user.password_hash))) {
+
+    if (user && (await bcrypt.compare(password, user.passhash))) {
       const token = generateToken(user);
-      res.json({ token });
+      res.json({ token, uid: user.id });
     } else {
       res.json({ error: "Invalid credentials" });
     }
