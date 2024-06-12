@@ -47,6 +47,10 @@ License This project is licensed under the MIT License.
 | :-------- | :------- | :------------------------- |
 | `get` | `http://localhost:3000/` | Home Page |
 | `get` | `http://localhost:3000/browseproduct` | Browse Products |
+| `get` | `http://localhost:3000/profile` | Profile |
+| `get` | `http://localhost:3000/about` | About |
+| `get` | `http://localhost:3000/cart` | Cart |
+| `get` | `http://localhost:3000/contact` | contact |
 
 ### Back-End Server
 
@@ -60,4 +64,23 @@ License This project is licensed under the MIT License.
 | `get` | `http://localhost:9000/browseproducts/newarrivals` | Retrieve New Arrivals |
 | `post` | `http://localhost:9000/signup/user` | user registration |
 | `post` | `http://localhost:9000/login` | user login |
+| `post` | `http://localhost:9000/cartdata` | Retrieve Cart Info |
+| `post` | `http://localhost:9000/addtocart` | item stored to cart |
+| `patch` | `http://localhost:9000/buyitem` | item purchased |
 
+## Screenshots
+
+### Home Page
+![alt text](https://github.com/thakaresahil/poscon/blob/main/demo/Home.png?raw=true)
+
+
+### Product Browse
+![alt text](https://github.com/thakaresahil/poscon/blob/main/demo/ProductBrowse.png?raw=true)
+
+
+### Product Details
+![alt text](https://github.com/thakaresahil/poscon/blob/main/demo/ItemDetails.png?raw=true)
+
+
+### Checkout
+![alt text](https://github.com/thakaresahil/poscon/blob/main/demo/CheckoutPage.png?raw=true)
