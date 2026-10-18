@@ -1,5 +1,7 @@
 # Poscon
 
+[![CI](https://github.com/thakaresahil/poscon/actions/workflows/ci.yml/badge.svg)](https://github.com/thakaresahil/poscon/actions/workflows/ci.yml)
+
 Poscon is a full-stack e-commerce store for clothing and accessories. Shoppers can browse products by category, view product details, sign up and log in, add items to a cart and check out.
 
 **Live demo:** _coming soon_
@@ -55,6 +57,8 @@ Poscon is a full-stack e-commerce store for clothing and accessories. Shoppers c
 | :------- | :--------------------------------------------------- |
 | Frontend | React 18, React Router, Tailwind CSS, MUI, Axios      |
 | Backend  | Node.js, Express, JSON Web Tokens, bcrypt, zod        |
+| Testing  | Jest, Supertest, React Testing Library, Playwright    |
+| DevOps   | Docker, Docker Compose, nginx, GitHub Actions         |
 | Database | PostgreSQL                                            |
 
 ## Architecture
@@ -89,6 +93,8 @@ poscon/
 │       ├── seed.js        # Sample products and demo user
 │       └── products.js    # Seed product data
 ├── e2e/                   # Playwright end-to-end tests
+├── .github/workflows/     # CI pipeline
+├── docker-compose.yml     # PostgreSQL, API and frontend in containers
 └── demo/                  # Screenshots
 ```
 
@@ -106,19 +112,33 @@ poscon/
 
 ## Getting Started
 
-### Prerequisites
+### Quick start with Docker
+
+With [Docker](https://docs.docker.com/get-docker/) installed, one command starts PostgreSQL, the API and the frontend:
+
+```bash
+git clone https://github.com/thakaresahil/poscon.git
+cd poscon
+docker compose up --build
+```
+
+Open `http://localhost:3000`. On first start the API applies the migrations and loads the sample data, including the demo accounts above. Data is kept in a Docker volume between restarts; `docker compose down -v` removes it.
+
+### Running without Docker
+
+#### Prerequisites
 
 - Node.js 18 or newer
 - PostgreSQL 14 or newer, running locally
 
-### 1. Clone the repository
+#### 1. Clone the repository
 
 ```bash
 git clone https://github.com/thakaresahil/poscon.git
 cd poscon
 ```
 
-### 2. Set up the API
+#### 2. Set up the API
 
 ```bash
 cd server
@@ -136,7 +156,7 @@ npm run dev
 
 The API runs on `http://localhost:9000`.
 
-### 3. Set up the frontend
+#### 3. Set up the frontend
 
 In a new terminal:
 
@@ -182,7 +202,9 @@ Run these inside `server/`:
 | `npm run dev`        | Start the API and restart on file changes     |
 | `npm run db:migrate` | Apply any new migrations                      |
 | `npm run db:seed`    | Replace all data with the sample data         |
+| `npm run db:setup`   | Apply migrations and seed only if the database is empty (used by Docker) |
 | `npm run db:reset`   | Drop everything, migrate and seed             |
+| `npm run lint`       | Check the code with ESLint                    |
 | `npm test`           | Run the API tests                             |
 | `npm run test:coverage` | Run the API tests with a coverage report   |
 
@@ -197,6 +219,19 @@ Run these inside `server/`:
 The API suite reaches **about 97% line coverage** (`npm run test:coverage`).
 
 The API and end-to-end tests run against a separate PostgreSQL database (`poscon_test` by default), which is created and rebuilt from the migrations and seed data before each run, so they never touch development data. The test setup refuses to run against a database whose name does not end in `_test`.
+
+### Continuous integration
+
+Every push runs the [CI workflow](.github/workflows/ci.yml) on GitHub Actions:
+
+| Job | Steps |
+| :-- | :---- |
+| API | ESLint, then the API tests with coverage against a PostgreSQL 16 service |
+| Frontend | ESLint, unit tests, and a production build that fails on any warning |
+| End to end | Playwright tests against the real API, frontend and database (runs after the first two pass) |
+| Docker | Builds both images, starts the stack with Docker Compose and checks the API and frontend respond |
+
+Failed end-to-end runs upload the Playwright report with screenshots and traces.
 
 To run the end-to-end tests for the first time:
 
@@ -299,8 +334,9 @@ Use any name, any future expiry date and any 3 digit CVV. A declined payment lea
 - [x] Search, filters, sorting and pagination
 - [x] Admin dashboard
 - [x] Automated tests
-- [ ] CI pipeline
-- [ ] Docker setup and API docs
+- [x] CI pipeline
+- [x] Docker setup
+- [ ] API docs
 - [ ] Live deployment
 
 ## License
