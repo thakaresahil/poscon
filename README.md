@@ -49,7 +49,15 @@ poscon/
 │       ├── api/client.js  # Shared axios client (base URL + auth header)
 │       └── component/     # Pages and UI components
 ├── server/                # Express API
-│   ├── server.js          # Routes, auth and validation
+│   ├── server.js          # Entry point
+│   ├── src/
+│   │   ├── app.js         # Express setup, middleware and routes
+│   │   ├── config/        # Environment and database pool
+│   │   ├── routes/        # Route definitions
+│   │   ├── controllers/   # Request handlers
+│   │   ├── middleware/    # Auth, validation, rate limiting, errors
+│   │   ├── validation/    # zod request schemas
+│   │   └── utils/
 │   └── db/
 │       ├── migrations/    # SQL schema, applied in order
 │       ├── migrate.js     # Migration runner
