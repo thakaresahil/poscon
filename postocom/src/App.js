@@ -2,7 +2,7 @@ import Footer from "./component/footer/Footer";
 import Home from "./component/home/Home";
 import Navbar from "./component/navbar/Navbar";
 
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, ScrollRestoration } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import ProtectedRoute from "./component/routing/ProtectedRoute";
@@ -13,6 +13,10 @@ import About from "./component/about/About";
 import Contact from "./component/contact/Contact";
 import Carthole from "./component/Carthold/Carthole";
 import NotFound from "./component/notfound/NotFound";
+import Faqs from "./component/content/Faqs";
+import ShippingReturns from "./component/content/ShippingReturns";
+import Privacy from "./component/content/Privacy";
+import Terms from "./component/content/Terms";
 import Checkout from "./component/checkout/Checkout";
 import Orders from "./component/orders/Orders";
 import OrderDetail from "./component/orders/OrderDetail";
@@ -25,8 +29,9 @@ import AdminOrders from "./component/admin/AdminOrders";
 
 const commonLayout = (component) => (
   <>
+    <ScrollRestoration />
     <Navbar />
-    {component}
+    <main>{component}</main>
     <Footer />
   </>
 );
@@ -59,6 +64,22 @@ const router = createBrowserRouter([
   {
     path: "/contact",
     element: commonLayout(<Contact />),
+  },
+  {
+    path: "/faqs",
+    element: commonLayout(<Faqs />),
+  },
+  {
+    path: "/shipping-returns",
+    element: commonLayout(<ShippingReturns />),
+  },
+  {
+    path: "/privacy",
+    element: commonLayout(<Privacy />),
+  },
+  {
+    path: "/terms",
+    element: commonLayout(<Terms />),
   },
   {
     path: "/cart",
