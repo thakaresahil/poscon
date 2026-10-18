@@ -1,42 +1,40 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Profile from "./Profile";
 import Cart from "./Cart";
 import { NavLink, useNavigate } from "react-router-dom";
 import Login from "../signupin/Login";
 import Register from "../signupin/Register";
+import { useAuth } from "../../context/AuthContext";
 
 function Navbar() {
   const navigate = useNavigate();
-  const [logIn, setLogIn] = useState(false);
-  const [register, setRegister] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [loginstatus, setLogInstatus] = useState(false);
-  const localcheck = localStorage.getItem("token");
+  const {
+    isLoggedIn: loginstatus,
+    logout,
+    authDialog,
+    openLogin,
+    openRegister,
+    closeAuthDialog,
+  } = useAuth();
 
-  useEffect(() => {
-    if (localcheck) {
-      setLogInstatus(true);
-    }
-  }, [localcheck]);
   const handleformsearch = () => {
     console.log("handleFormsearch");
   };
   const handleLoginComponent = () => {
-    setRegister(false);
-    setLogIn(true);
-  };
-  const handleClose = () => {
-    setLogIn(false);
-    setRegister(false);
+    setIsOpen(false);
+    openLogin();
   };
 
   const handleProfile = () => {
+    setIsOpen(false);
     navigate("/profile");
-  }
+  };
 
-  const handleregister = () => {
-    setLogIn(false);
-    setRegister(true);
+  const handleLogout = () => {
+    setIsOpen(false);
+    logout();
+    navigate("/");
   };
 
   return (
@@ -49,7 +47,9 @@ function Navbar() {
           <NavLink to="/about">About</NavLink>
           {!loginstatus ? (
             <button onClick={handleLoginComponent}>Log In</button>
-          ) : null}
+          ) : (
+            <button onClick={handleLogout}>Log Out</button>
+          )}
         </div>
         <div className="flex justify-end items-center gap-2">
           <div className="flex justify-around items-center gap-4">
@@ -168,24 +168,34 @@ function Navbar() {
                       </button>
                     </li>
                   ) : null}
+                  {loginstatus ? (
+                    <li>
+                      <button
+                        className="block py-2 px-4 text-gray-900 rounded hover:bg-gray-100"
+                        onClick={handleLogout}
+                      >
+                        Log out
+                      </button>
+                    </li>
+                  ) : null}
                 </ul>
               </div>
             )}
           </div>
         </div>
       </div>
-      {logIn ? (
+      {authDialog === "login" ? (
         <Login
-          open={logIn}
-          handleClose={handleClose}
-          handleRegister={handleregister}
+          open
+          handleClose={closeAuthDialog}
+          handleRegister={openRegister}
         />
       ) : null}
-      {register ? (
+      {authDialog === "register" ? (
         <Register
-          open={register}
-          handleClose={handleClose}
-          handleLoginComponent={handleLoginComponent}
+          open
+          handleClose={closeAuthDialog}
+          handleLoginComponent={openLogin}
         />
       ) : null}
     </div>

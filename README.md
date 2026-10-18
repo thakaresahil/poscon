@@ -11,10 +11,12 @@ Poscon is a full-stack e-commerce store for clothing and accessories. Shoppers c
 ## Features
 
 - Product catalogue for men, women, accessories and new arrivals, with a bestsellers section on the home page
-- Product detail view with discount pricing and quantity selection
-- Account signup and login with hashed passwords (bcrypt) and JWT authentication
+- Product pages with their own shareable URL (`/product/:id`), discount pricing and quantity selection
+- Account signup, login and logout with hashed passwords (bcrypt) and JWT authentication
+- Shared login state across the app, protected cart and profile pages, and automatic logout when a session expires
 - Cart and checkout tied to the logged-in user
 - Profile page for the logged-in user
+- Custom 404 page for unknown URLs
 - Database migrations and seed data, so the whole app can be set up with one command
 
 ### Security
@@ -46,7 +48,8 @@ flowchart LR
 poscon/
 ├── postocom/              # React frontend
 │   └── src/
-│       ├── api/client.js  # Shared axios client (base URL + auth header)
+│       ├── api/client.js  # Shared axios client (base URL, auth header, session expiry)
+│       ├── context/       # Auth context (login state and login dialog)
 │       └── component/     # Pages and UI components
 ├── server/                # Express API
 │   ├── server.js          # Entry point
@@ -167,6 +170,7 @@ Endpoints marked 🔒 need an `Authorization: Bearer <token>` header, which the 
 | `GET`   | `/browseproducts/women`       | Women's products                         |
 | `GET`   | `/browseproducts/access`      | Accessories                              |
 | `GET`   | `/browseproducts/newarrivals` | All new arrivals                         |
+| `GET`   | `/products/:id`               | A single product                         |
 | `GET`   | `/profile` 🔒                 | Logged-in user's profile                 |
 | `GET`   | `/cartdata` 🔒                | Items in the user's cart                 |
 | `POST`  | `/addtocart` 🔒               | Add a product to the cart (`pid`, `count`) |
