@@ -2,9 +2,10 @@ import Footer from "./component/footer/Footer";
 import Home from "./component/home/Home";
 import Navbar from "./component/navbar/Navbar";
 
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, ScrollRestoration } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
+import { ToastProvider } from "./context/ToastContext";
 import ProtectedRoute from "./component/routing/ProtectedRoute";
 import Productbrowse from "./component/product/Productbrowse";
 import ProductPage from "./component/product/ProductPage";
@@ -13,6 +14,10 @@ import About from "./component/about/About";
 import Contact from "./component/contact/Contact";
 import Carthole from "./component/Carthold/Carthole";
 import NotFound from "./component/notfound/NotFound";
+import Faqs from "./component/content/Faqs";
+import ShippingReturns from "./component/content/ShippingReturns";
+import Privacy from "./component/content/Privacy";
+import Terms from "./component/content/Terms";
 import Checkout from "./component/checkout/Checkout";
 import Orders from "./component/orders/Orders";
 import OrderDetail from "./component/orders/OrderDetail";
@@ -22,13 +27,16 @@ import Dashboard from "./component/admin/Dashboard";
 import AdminProducts from "./component/admin/AdminProducts";
 import ProductForm from "./component/admin/ProductForm";
 import AdminOrders from "./component/admin/AdminOrders";
+import AdminMessages from "./component/admin/AdminMessages";
 
+// The toast area lives inside the router so its links work
 const commonLayout = (component) => (
-  <>
+  <ToastProvider>
+    <ScrollRestoration />
     <Navbar />
-    {component}
+    <main>{component}</main>
     <Footer />
-  </>
+  </ToastProvider>
 );
 
 const router = createBrowserRouter([
@@ -59,6 +67,22 @@ const router = createBrowserRouter([
   {
     path: "/contact",
     element: commonLayout(<Contact />),
+  },
+  {
+    path: "/faqs",
+    element: commonLayout(<Faqs />),
+  },
+  {
+    path: "/shipping-returns",
+    element: commonLayout(<ShippingReturns />),
+  },
+  {
+    path: "/privacy",
+    element: commonLayout(<Privacy />),
+  },
+  {
+    path: "/terms",
+    element: commonLayout(<Terms />),
   },
   {
     path: "/cart",
@@ -129,6 +153,14 @@ const router = createBrowserRouter([
     element: commonLayout(
       <AdminRoute>
         <ProductForm />
+      </AdminRoute>
+    ),
+  },
+  {
+    path: "/admin/messages",
+    element: commonLayout(
+      <AdminRoute>
+        <AdminMessages />
       </AdminRoute>
     ),
   },

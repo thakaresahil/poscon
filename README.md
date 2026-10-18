@@ -4,7 +4,9 @@
 
 Poscon is a full-stack e-commerce store for clothing and accessories. Shoppers can browse products by category, view product details, sign up and log in, add items to a cart and check out.
 
-**Live demo:** _coming soon_ · [How to deploy your own copy](docs/DEPLOYMENT.md)
+**Live demo:** [poscon-sandy.vercel.app](https://poscon-sandy.vercel.app) · **API docs:** [poscon-api.onrender.com/docs](https://poscon-api.onrender.com/docs) · [How to deploy your own copy](docs/DEPLOYMENT.md)
+
+> The API runs on Render's free tier and sleeps when idle, so the first visit can take up to a minute to load.
 
 **Demo accounts** (created by the seed script):
 
@@ -21,16 +23,20 @@ Poscon is a full-stack e-commerce store for clothing and accessories. Shoppers c
 - Product search from the navbar, with filters for gender, category and price range
 - Sorting by newest, popularity (units sold), price and biggest discount, with pagination
 - Search, filters, sort and page are kept in the URL, so results can be shared, reloaded and navigated with the back button
-- Product pages with their own shareable URL (`/product/:id`), discount pricing and quantity selection
+- Product pages with their own shareable URL (`/product/:id`), a size selector, breadcrumbs and related products
+- Products come in letter sizes, waist sizes or one size; the chosen size is kept on cart and order items
 - Account signup, login and logout with hashed passwords (bcrypt) and JWT authentication
 - Shared login state across the app, protected cart and profile pages, and automatic logout when a session expires
-- Cart with quantity controls, item removal, live subtotal and a navbar item count badge
+- Cart with quantity controls, item removal, an order summary and a navbar item count badge; adding an item shows a confirmation without leaving the page
 - Adding a product that is already in the cart increases its quantity instead of duplicating it
-- Checkout with a shipping address form, prefilled from the user's profile
+- Checkout with a delivery address form, filled in from the saved address, with an option to save a new one
 - Orders are created in a single database transaction that locks the cart, so a double click cannot place the same order twice
 - Order history and order detail pages, with the price paid saved on each order item
 - Simulated payment step with card, UPI and cash on delivery, including declined payments and retries (see [Demo Payments](#demo-payments))
-- Profile page for the logged-in user
+- Account page to edit name, phone number and default delivery address, and to change the password
+- Contact form that saves messages for the store admin, plus About, FAQs, Shipping & Returns, Privacy and Terms pages
+- Responsive design for phones, tablets and desktops, built on a small shared design system (buttons, inputs, cards, typography)
+- Live Deal of the Week countdown linked to the product with the biggest discount
 - Custom 404 page for unknown URLs
 
 ### Admin dashboard
@@ -38,6 +44,7 @@ Poscon is a full-stack e-commerce store for clothing and accessories. Shoppers c
 - Revenue, order, customer and product totals, a 30 day revenue chart, top selling products and recent orders
 - Add, edit and delete products with a live preview, and choose which products appear in Best Sellers
 - View all orders, filter by status and move orders through Placed → Shipped → Delivered, or cancel them
+- Read contact form messages, filter unread ones and reply by email
 - Admin pages are hidden from customers, and every admin API request checks the admin role in the database
 - Database migrations and seed data, so the whole app can be set up with one command
 
@@ -107,10 +114,11 @@ poscon/
 | :----------- | :------------------------------------------------------------- |
 | `users`      | Accounts with email, phone number, bcrypt password hash and admin flag |
 | `products`   | Catalogue with price, sale price, gender, category, bestseller flag |
-| `cart`       | Items in a user's cart, one row per product                     |
+| `cart`       | Items in a user's cart, one row per product and size            |
 | `orders`     | Placed orders with status, total and shipping address           |
 | `order_items`| Products in each order, with the name, image and price at purchase time |
 | `payments`   | Every payment attempt with its result, amount and transaction ID |
+| `contact_messages` | Messages sent through the contact form, with read status   |
 | `bestseller` | View over `products` where the bestseller flag is set          |
 
 ## Getting Started
@@ -192,6 +200,7 @@ The app opens at `http://localhost:3000`.
 | `SESSION_SECRET` | Secret used to sign JWTs                            |
 | `PG_TEST_DATABASE` | Database used by the test suites (default `poscon_test`, must end in `_test`) |
 | `AUTH_RATE_LIMIT` | Login and signup attempts allowed per 15 minutes (default `20`) |
+| `CONTACT_RATE_LIMIT` | Contact form messages allowed per 15 minutes from one address (default `5`) |
 
 **postocom/.env**
 
@@ -223,11 +232,11 @@ The app is set up to run on free tiers of [Neon](https://neon.tech) (PostgreSQL)
 
 | Suite | Tool | What it covers | Command |
 | :---- | :--- | :------------- | :------ |
-| API | Jest + Supertest | 95 tests: auth, products and search, cart, orders, payments, admin access, API docs accuracy, plus unit tests for the payment helpers | `cd server && npm test` |
+| API | Jest + Supertest | 116 tests: auth, profile, products and search, cart and sizes, orders, payments, contact messages, admin access, API docs accuracy, plus unit tests for the payment helpers | `cd server && npm test` |
 | Frontend | Jest + React Testing Library | Card helpers, formatting and the product card component | `cd postocom && npm test` |
-| End to end | Playwright | Full journeys in a real browser: sign up, search, cart, checkout, declined and successful payment, order history, admin adding a product and shipping an order, protected pages | `cd e2e && npm test` |
+| End to end | Playwright | 13 journeys in a real browser: sign up, search, sizes, cart, checkout, declined and successful payment, order history, saved address, contact form, admin adding a product, shipping an order and reading messages, protected pages, and phone layouts | `cd e2e && npm test` |
 
-The API suite reaches **about 97% line coverage** (`npm run test:coverage`).
+The API suite reaches **about 96% line coverage** (`npm run test:coverage`).
 
 The API and end-to-end tests run against a separate PostgreSQL database (`poscon_test` by default), which is created and rebuilt from the migrations and seed data before each run, so they never touch development data. The test setup refuses to run against a database whose name does not end in `_test`.
 
@@ -274,8 +283,11 @@ Endpoints marked 🔒 need an `Authorization: Bearer <token>` header, which the 
 | `GET`   | `/health`                     | Checks the API and database are up       |
 | `GET`   | `/products/:id`               | A single product                         |
 | `GET`   | `/profile` 🔒                 | Logged-in user's profile                 |
+| `PATCH` | `/profile` 🔒                 | Update name, phone and saved address     |
+| `PATCH` | `/profile/password` 🔒        | Change the password (`currentPassword`, `newPassword`) |
+| `POST`  | `/contact`                    | Send a message to the store (`name`, `email`, `subject`, `message`) |
 | `GET`   | `/cartdata` 🔒                | Items in the user's cart                 |
-| `POST`  | `/addtocart` 🔒               | Add a product to the cart, or increase its quantity (`pid`, `count`) |
+| `POST`  | `/addtocart` 🔒               | Add a product to the cart, or increase its quantity (`pid`, `count`, `size`) |
 | `PATCH` | `/cart/:id` 🔒                | Change the quantity of a cart item (`quantity`, 1 to 10) |
 | `DELETE`| `/cart/:id` 🔒                | Remove an item from the cart             |
 | `POST`  | `/orders` 🔒                  | Place an order from the cart (`name`, `phone`, `address`, `city`, `pincode`) |
@@ -314,6 +326,8 @@ All admin endpoints need a token for a user with the admin role. Other users get
 | `POST`   | `/admin/products`       | Create a product                                   |
 | `PUT`    | `/admin/products/:id`   | Update a product                                   |
 | `DELETE` | `/admin/products/:id`   | Delete a product (past orders keep their copy)     |
+| `GET`    | `/admin/messages`       | Contact form messages, optionally filtered by `status` (`new` or `read`) |
+| `PATCH`  | `/admin/messages/:id`   | Mark a message as `read` or `new`                  |
 
 Errors are returned as JSON in the form `{ "error": "message" }` with a matching status code (`400`, `401`, `402`, `403`, `404`, `409`, `429` or `500`).
 
@@ -343,8 +357,12 @@ Use any name, any future expiry date and any 3 digit CVV. A declined payment lea
 | ![Payment](demo/Payment.png) | ![Order confirmation](demo/OrderConfirmation.png) |
 | **Admin dashboard** | **Admin orders** |
 | ![Admin dashboard](demo/AdminDashboard.png) | ![Admin orders](demo/AdminOrders.png) |
-| **Interactive API docs** | |
-| ![API docs](demo/ApiDocs.png) | |
+| **Account** | **Contact** |
+| ![Account](demo/Account.png) | ![Contact](demo/Contact.png) |
+| **Admin messages** | **Interactive API docs** |
+| ![Admin messages](demo/AdminMessages.png) | ![API docs](demo/ApiDocs.png) |
+
+<p align="center"><img src="demo/MobileProduct.png" alt="Product page on a phone" width="300"></p>
 
 Product images are original illustrations, one per product, created by [`postocom/scripts/generate-product-images.mjs`](postocom/scripts/generate-product-images.mjs). Admins can replace any of them with a photo URL from the product form.
 
@@ -359,7 +377,8 @@ Product images are original illustrations, one per product, created by [`postoco
 - [x] CI pipeline
 - [x] Docker setup
 - [x] API docs (OpenAPI + Swagger UI)
-- [ ] Live deployment
+- [x] Live deployment
+- [x] Responsive design, content pages, contact form, account settings and product sizes
 
 ## License
 

@@ -20,7 +20,8 @@ export const getStats = async (req, res) => {
          (SELECT COUNT(*)::int FROM orders) AS orders,
          (SELECT COUNT(*)::int FROM orders WHERE status = 'placed') AS orders_to_ship,
          (SELECT COUNT(*)::int FROM users WHERE NOT is_admin) AS customers,
-         (SELECT COUNT(*)::int FROM products) AS products`
+         (SELECT COUNT(*)::int FROM products) AS products,
+         (SELECT COUNT(*)::int FROM contact_messages WHERE status = 'new') AS new_messages`
     ),
     db.query(
       `SELECT TO_CHAR(day, 'YYYY-MM-DD') AS day,
@@ -66,7 +67,12 @@ export const getAllOrders = async (req, res) => {
     db.query(
       `SELECT orders.id, orders.status, orders.payment_status, orders.payment_method, orders.total,
               orders.created_at, orders.ship_name, orders.ship_city, users.email,
-              STRING_AGG(order_items.product_name || ' x' || order_items.quantity, ', ' ORDER BY order_items.id) AS items
+              STRING_AGG(
+                order_items.product_name
+                  || CASE WHEN order_items.size <> '' THEN ' (' || order_items.size || ')' ELSE '' END
+                  || ' x' || order_items.quantity,
+                ', ' ORDER BY order_items.id
+              ) AS items
        FROM orders
        JOIN users ON users.id = orders.user_id
        LEFT JOIN order_items ON order_items.order_id = orders.id
@@ -115,6 +121,7 @@ export const updateOrderStatus = async (req, res) => {
 };
 
 const productColumns = [
+  "sizes",
   "namee",
   "description",
   "img",

@@ -39,7 +39,7 @@ function Orders() {
         <h1 className="text-3xl">{error || "You haven't placed any orders yet"}</h1>
         <NavLink
           to="/browseproduct"
-          className="px-6 py-2 bg-red-500 text-white rounded-md transition-transform duration-300 hover:scale-105"
+          className="btn btn-primary"
         >
           Start Shopping
         </NavLink>

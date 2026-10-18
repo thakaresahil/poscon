@@ -38,6 +38,8 @@ function Productbrowse() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [priceInput, setPriceInput] = useState({ min: minPrice, max: maxPrice });
+  // Filters are always visible on larger screens and open as a panel on phones
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     api
@@ -101,10 +103,23 @@ function Productbrowse() {
   const lastItem = Math.min(page * PAGE_SIZE, result.total);
 
   return (
-    <div className="container mx-auto flex flex-col md:flex-row gap-8 my-12 px-4">
-      <aside className="flex flex-col gap-6 md:w-64 shrink-0">
+    <div className="page my-8 flex flex-col gap-6 md:my-12 md:flex-row md:gap-8">
+      <button
+        type="button"
+        className="btn btn-secondary md:hidden"
+        aria-expanded={showFilters}
+        aria-controls="product-filters"
+        onClick={() => setShowFilters(!showFilters)}
+      >
+        {showFilters ? "Hide filters" : "Filters"}
+        {hasFilters && !showFilters ? <span className="rounded-full bg-red-500 px-2 text-xs text-white">On</span> : null}
+      </button>
+      <aside
+        id="product-filters"
+        className={`${showFilters ? "flex" : "hidden"} shrink-0 flex-col gap-6 rounded-lg border border-gray-200 p-4 md:flex md:w-60 md:border-0 md:p-0`}
+      >
         <div className="flex flex-col items-start gap-2">
-          <h2 className="text-2xl">Shop</h2>
+          <h2 className="section-title">Shop</h2>
           <button
             className={filterButtonClass(!hasFilters && sort === "newest")}
             onClick={() => setSearchParams({ sort: "newest" })}
@@ -159,7 +174,7 @@ function Productbrowse() {
               min="0"
               name="minPrice"
               placeholder="Min"
-              className="border rounded p-2 w-full"
+              className="input"
               value={priceInput.min}
               onChange={(event) => setPriceInput({ ...priceInput, min: event.target.value })}
             />
@@ -168,18 +183,18 @@ function Productbrowse() {
               min="0"
               name="maxPrice"
               placeholder="Max"
-              className="border rounded p-2 w-full"
+              className="input"
               value={priceInput.max}
               onChange={(event) => setPriceInput({ ...priceInput, max: event.target.value })}
             />
           </div>
-          <button type="submit" className="py-2 rounded bg-red-500 text-white hover:bg-red-600">
+          <button type="submit" className="btn btn-primary">
             Apply
           </button>
         </form>
 
         {hasFilters && (
-          <button className="text-blue-600 hover:underline text-left" onClick={clearFilters}>
+          <button className="link text-left" onClick={clearFilters}>
             Clear all filters
           </button>
         )}
@@ -198,7 +213,7 @@ function Productbrowse() {
           <label className="flex items-center gap-2">
             <span className="text-gray-500">Sort by</span>
             <select
-              className="block border border-grey-light py-2 px-4 rounded"
+              className="input w-auto"
               name="sort"
               value={sort}
               onChange={(event) => updateParams({ sort: event.target.value })}
@@ -221,14 +236,14 @@ function Productbrowse() {
           <div className="flex flex-col items-center gap-4 my-12">
             <p className="text-xl">No products match your search.</p>
             <button
-              className="px-6 py-2 bg-red-500 text-white rounded-md transition-transform duration-300 hover:scale-105"
+              className="btn btn-primary"
               onClick={clearFilters}
             >
               Clear Filters
             </button>
           </div>
         ) : (
-          <div className="flex flex-wrap justify-around items-center gap-6">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6">
             {result.products.map((productItem) => (
               <Cards
                 key={productItem.id}
@@ -245,7 +260,7 @@ function Productbrowse() {
         {!loading && result.totalPages > 1 && (
           <nav className="flex justify-center items-center gap-2" aria-label="Pagination">
             <button
-              className="px-3 py-1 border rounded disabled:text-gray-300"
+              className="btn btn-secondary btn-sm"
               disabled={page <= 1}
               onClick={() => updateParams({ page: page - 1 })}
             >
@@ -264,7 +279,7 @@ function Productbrowse() {
               </button>
             ))}
             <button
-              className="px-3 py-1 border rounded disabled:text-gray-300"
+              className="btn btn-secondary btn-sm"
               disabled={page >= result.totalPages}
               onClick={() => updateParams({ page: page + 1 })}
             >

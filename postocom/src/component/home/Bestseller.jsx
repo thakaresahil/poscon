@@ -22,17 +22,17 @@ function Bestseller() {
   }, []);
 
   return (
-    <div className="container mx-auto flex flex-col justify-around items-center">
-      <div className="flex flex-col items-center justify-around gap-3">
-        <h2 className="text-3xl">Best Sellers</h2>
-        <div className="border-4 border-red-500 w-20"></div>
+    <section className="page my-16">
+      <div className="mb-8 flex flex-col items-center gap-2 text-center">
+        <p className="eyebrow">Customer Favourites</p>
+        <h2 className="section-title">Best Sellers</h2>
       </div>
-      <div className="flex flex-wrap mx-24 gap-6 justify-around items-center my-8">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
         {loading ? (
-          <Loading />
+          <div className="col-span-full"><Loading /></div>
         ) : (
           bsell.length > 0 ? (
-            bsell.map((newItem) => (
+            bsell.slice(0, 8).map((newItem) => (
               <Cards
                 key={newItem.id}
                 id={newItem.id}
@@ -43,11 +43,11 @@ function Bestseller() {
               />
             ))
           ) : (
-            <p>No best sellers found.</p>
+            <p className="col-span-full muted">No best sellers found.</p>
           )
         )}
       </div>
-    </div>
+    </section>
   );
 }
 

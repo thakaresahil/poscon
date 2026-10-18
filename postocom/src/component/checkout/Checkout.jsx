@@ -4,12 +4,11 @@ import api from "../../api/client";
 import { useCart } from "../../context/CartContext";
 import Loading from "../loading/Loading";
 
-const inputClass =
-  "block border border-grey-light w-full p-3 rounded mb-4 hover:shadow-lg font-medium transition transform hover:-translate-y-0.5";
+const inputClass = "input mb-4";
 
 function Checkout() {
   const navigate = useNavigate();
-  const { items, loading, count, total, placeOrder } = useCart();
+  const { items, ready, count, total, placeOrder } = useCart();
   const [shipping, setShipping] = useState({
     name: "",
     phone: "",
@@ -19,18 +18,25 @@ function Checkout() {
   });
   const [formError, setFormError] = useState("");
   const [placing, setPlacing] = useState(false);
+  const [profile, setProfile] = useState(null);
+  const [saveAddress, setSaveAddress] = useState(false);
 
   // Prefill the form with what we already know about the user
   useEffect(() => {
     api
       .get("/profile")
       .then((response) => {
-        const { name, pnum, address } = response.data;
+        const { name, pnum, address, city, pincode } = response.data;
+        setProfile(response.data);
+        // Offer to save the address when the account does not have one yet
+        setSaveAddress(!address);
         setShipping((current) => ({
           ...current,
           name: current.name || name || "",
           phone: current.phone || pnum || "",
           address: current.address || address || "",
+          city: current.city || city || "",
+          pincode: current.pincode || pincode || "",
         }));
       })
       .catch(() => {});
@@ -56,6 +62,17 @@ function Checkout() {
     setPlacing(true);
     try {
       const order = await placeOrder(shipping);
+      if (saveAddress && profile) {
+        await api
+          .patch("/profile", {
+            name: profile.name || shipping.name,
+            pnum: profile.pnum,
+            address: shipping.address,
+            city: shipping.city,
+            pincode: shipping.pincode,
+          })
+          .catch(() => {});
+      }
       navigate(`/orders/${order.id}/pay`, { replace: true });
     } catch (error) {
       setFormError(error.response?.data?.error || "Could not place your order, please try again.");
@@ -63,7 +80,7 @@ function Checkout() {
     }
   };
 
-  if (loading && items.length === 0) {
+  if (!ready) {
     return (
       <div className="my-16">
         <Loading />
@@ -75,35 +92,55 @@ function Checkout() {
   }
 
   return (
-    <div className="container mx-auto flex flex-col lg:flex-row gap-12 my-16 justify-center">
-      <form className="w-full lg:w-1/2" onSubmit={handlesubmit}>
-        <h1 className="mb-8 text-3xl">Shipping Address</h1>
-        <input className={inputClass} name="name" placeholder="Full Name" value={shipping.name} onChange={handlechange} />
-        <input className={inputClass} name="phone" placeholder="Phone Number" value={shipping.phone} onChange={handlechange} />
-        <input className={inputClass} name="address" placeholder="Address (house no, street, area)" value={shipping.address} onChange={handlechange} />
-        <div className="flex gap-4">
-          <input className={inputClass} name="city" placeholder="City" value={shipping.city} onChange={handlechange} />
-          <input className={inputClass} name="pincode" placeholder="Pincode" value={shipping.pincode} onChange={handlechange} />
+    <div className="page my-10 grid gap-8 lg:grid-cols-[1fr_360px]">
+      <form className="card flex flex-col gap-4 p-6" onSubmit={handlesubmit} noValidate>
+        <div>
+          <p className="eyebrow">Step 1 of 2</p>
+          <h1 className="page-title mt-1">Delivery Address</h1>
         </div>
-        {formError && <p className="text-red-700 text-sm mb-4">{formError}</p>}
-        <button
-          type="submit"
-          disabled={placing}
-          className="w-full text-center py-3 rounded bg-red-500 text-white hover:bg-red-600 focus:outline-none my-1 hover:shadow-lg font-medium transition transform hover:-translate-y-0.5 disabled:opacity-60"
-        >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="ship-name" className="label">Full name</label>
+            <input id="ship-name" className={inputClass} name="name" placeholder="Full Name" autoComplete="name" value={shipping.name} onChange={handlechange} />
+          </div>
+          <div>
+            <label htmlFor="ship-phone" className="label">Phone number</label>
+            <input id="ship-phone" className={inputClass} name="phone" type="tel" inputMode="numeric" placeholder="Phone Number" autoComplete="tel" value={shipping.phone} onChange={handlechange} />
+          </div>
+          <div className="sm:col-span-2">
+            <label htmlFor="ship-address" className="label">Address</label>
+            <input id="ship-address" className={inputClass} name="address" placeholder="Address (house no, street, area)" autoComplete="street-address" value={shipping.address} onChange={handlechange} />
+          </div>
+          <div>
+            <label htmlFor="ship-city" className="label">City</label>
+            <input id="ship-city" className={inputClass} name="city" placeholder="City" autoComplete="address-level2" value={shipping.city} onChange={handlechange} />
+          </div>
+          <div>
+            <label htmlFor="ship-pincode" className="label">Pincode</label>
+            <input id="ship-pincode" className={inputClass} name="pincode" inputMode="numeric" placeholder="Pincode" autoComplete="postal-code" value={shipping.pincode} onChange={handlechange} />
+          </div>
+        </div>
+        {profile && (
+          <label className="flex items-center gap-2 text-sm text-gray-700">
+            <input type="checkbox" checked={saveAddress} onChange={(event) => setSaveAddress(event.target.checked)} />
+            Save this address to my account
+          </label>
+        )}
+        {formError && <p className="field-error" role="alert">{formError}</p>}
+        <button type="submit" disabled={placing} className="btn btn-primary w-full">
           {placing ? "Placing Order..." : `Continue to Payment (₹${total})`}
         </button>
       </form>
 
-      <div className="w-full lg:w-1/3 bg-gray-50 p-6 rounded h-fit">
-        <h2 className="text-2xl mb-4">Order Summary</h2>
+      <aside className="card h-fit p-5 lg:sticky lg:top-6">
+        <h2 className="mb-4 text-lg font-semibold">Order Summary</h2>
         {items.map((item) => (
           <div key={item.id} className="flex gap-4 items-center mb-4">
-            <img src={item.img} alt={item.namee} className="h-20" />
+            <img src={item.img} alt={item.namee} className="h-20 w-16 rounded-md bg-gray-50 object-cover" />
             <div className="flex-1">
               <p>{item.namee}</p>
               <p className="text-gray-500 text-sm">
-                ₹{item.sellprice} x {item.quantity}
+                {item.size ? `Size ${item.size} · ` : ""}₹{item.sellprice} x {item.quantity}
               </p>
             </div>
             <p className="font-semibold">₹{item.sellprice * item.quantity}</p>
@@ -122,7 +159,7 @@ function Checkout() {
           <p>Total</p>
           <p>₹{total}</p>
         </div>
-      </div>
+      </aside>
     </div>
   );
 }

@@ -6,8 +6,8 @@ describe("placing orders", () => {
   test("creates an order from the cart and empties the cart", async () => {
     const customer = await createCustomer();
     const order = await placeOrder(customer.token, [
-      { pid: 3, count: 2 },
-      { pid: 5, count: 1 },
+      { pid: 3, count: 2, size: "M" },
+      { pid: 5, count: 1, size: "M" },
     ]);
 
     expect(order).toMatchObject({ status: "placed", payment_status: "pending", total: 2 * 1299 + 399 });
@@ -33,7 +33,7 @@ describe("placing orders", () => {
 
   test("two simultaneous checkouts create only one order", async () => {
     const customer = await createCustomer();
-    await api().post("/addtocart").set(auth(customer.token)).send({ pid: 1, count: 1 });
+    await api().post("/addtocart").set(auth(customer.token)).send({ pid: 1, count: 1, size: "M" });
 
     const responses = await Promise.all([
       api().post("/orders").set(auth(customer.token)).send(shipping),
@@ -49,21 +49,21 @@ describe("placing orders", () => {
 describe("viewing orders", () => {
   test("lists and shows the customer's orders with items and address", async () => {
     const customer = await createCustomer();
-    const order = await placeOrder(customer.token, [{ pid: 3, count: 2 }]);
+    const order = await placeOrder(customer.token, [{ pid: 3, count: 2, size: "M" }]);
 
     const list = await api().get("/orders").set(auth(customer.token)).expect(200);
     expect(list.body[0]).toMatchObject({ id: order.id, item_count: 2 });
 
     const detail = await api().get(`/orders/${order.id}`).set(auth(customer.token)).expect(200);
     expect(detail.body.items).toEqual([
-      expect.objectContaining({ product_name: "Linen Blend Casual Shirt", price: 1299, quantity: 2 }),
+      expect.objectContaining({ product_name: "Linen Blend Casual Shirt", price: 1299, quantity: 2, size: "M" }),
     ]);
     expect(detail.body.ship_city).toBe(shipping.city);
   });
 
   test("keeps the price paid when the product price changes", async () => {
     const customer = await createCustomer();
-    const order = await placeOrder(customer.token, [{ pid: 4, count: 1 }]);
+    const order = await placeOrder(customer.token, [{ pid: 4, count: 1, size: "M" }]);
     const original = (await api().get(`/orders/${order.id}`).set(auth(customer.token))).body.items[0].price;
 
     await pool.query("UPDATE products SET sellprice = sellprice + 500 WHERE id = 4");

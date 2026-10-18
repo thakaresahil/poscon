@@ -4,8 +4,8 @@ import { useCart } from "../../context/CartContext";
 function Cart() {
   const { count } = useCart();
   return (
-    <div className="relative block py-2 px-4 text-gray-900 rounded hover:bg-gray-100">
-      <svg viewBox="0 0 24 24" fill="currentColor" height="1em" width="1em">
+    <div className="relative inline-flex h-10 w-10 items-center justify-center rounded-md text-gray-800 hover:bg-gray-100">
+      <svg viewBox="0 0 24 24" fill="currentColor" height="1.35em" width="1.35em" aria-hidden="true">
         <path d="M17 16a3 3 0 11-2.83 2H9.83a3 3 0 11-5.62-.1A3 3 0 015 12V4H3a1 1 0 110-2h3a1 1 0 011 1v1h14a1 1 0 01.9 1.45l-4 8a1 1 0 01-.9.55H5a1 1 0 000 2h12zM7 12h9.38l3-6H7v6zm0 8a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z" />
       </svg>
       {count > 0 && (

@@ -13,8 +13,7 @@ import {
   isValidCardNumber,
 } from "../../utils/payment";
 
-const inputClass =
-  "block border border-grey-light w-full p-3 rounded mb-4 hover:shadow-lg font-medium transition transform hover:-translate-y-0.5";
+const inputClass = "input mb-4";
 
 const methods = [
   { id: "card", label: "Credit / Debit Card" },
@@ -236,7 +235,7 @@ function Payment() {
         <button
           type="submit"
           disabled={processing}
-          className="w-full text-center py-3 rounded bg-red-500 text-white hover:bg-red-600 focus:outline-none my-1 hover:shadow-lg font-medium transition transform hover:-translate-y-0.5 disabled:opacity-60"
+          className="btn btn-primary w-full"
         >
           {processing
             ? "Processing..."

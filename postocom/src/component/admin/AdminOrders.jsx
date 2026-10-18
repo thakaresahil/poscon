@@ -143,14 +143,14 @@ function AdminOrders() {
 
       {result && result.totalPages > 1 && (
         <nav className="flex justify-center items-center gap-2" aria-label="Pagination">
-          <button className="px-3 py-1 border rounded disabled:text-gray-300" disabled={page <= 1} onClick={() => goToPage(page - 1)}>
+          <button className="btn btn-secondary btn-sm" disabled={page <= 1} onClick={() => goToPage(page - 1)}>
             Previous
           </button>
           <span className="text-gray-500">
             Page {page} of {result.totalPages}
           </span>
           <button
-            className="px-3 py-1 border rounded disabled:text-gray-300"
+            className="btn btn-secondary btn-sm"
             disabled={page >= result.totalPages}
             onClick={() => goToPage(page + 1)}
           >

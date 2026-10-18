@@ -1,5 +1,6 @@
 import api from "../../api/client";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Cards from "../cards/Cards";
 import Loading from "../loading/Loading";
 
@@ -22,14 +23,14 @@ function Newarrival() {
   }, []);
 
   return (
-    <div className="container mx-auto my-28">
-      <div className="flex flex-col justify-around items-center my-20 gap-2">
-        <h1 className="text-4xl">New Arrivals</h1>
-        <div className="border-4 border-red-500 w-20"></div>
+    <section className="page my-16">
+      <div className="mb-8 flex flex-col items-center gap-2 text-center">
+        <p className="eyebrow">Just In</p>
+        <h2 className="section-title">New Arrivals</h2>
       </div>
-      <div className="flex flex-wrap mx-24 gap-6 justify-around items-center my-8">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
         {loading ? (
-          <Loading />
+          <div className="col-span-full"><Loading /></div>
         ) : (
           newarrival.length > 0 ? (
             newarrival.map((newItem) => (
@@ -43,11 +44,14 @@ function Newarrival() {
               />
             ))
           ) : (
-            <p>No new arrivals found.</p>
+            <p className="col-span-full muted">No new arrivals found.</p>
           )
         )}
       </div>
-    </div>
+      <div className="mt-8 text-center">
+        <Link to="/browseproduct?sort=newest" className="btn btn-secondary">View all new arrivals</Link>
+      </div>
+    </section>
   );
 }
 

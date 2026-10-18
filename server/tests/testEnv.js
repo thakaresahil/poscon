@@ -11,3 +11,4 @@ process.env.PG_DATABASE = testDatabase;
 delete process.env.DATABASE_URL;
 process.env.SESSION_SECRET = process.env.SESSION_SECRET || "test-secret";
 process.env.AUTH_RATE_LIMIT = "10000";
+process.env.CONTACT_RATE_LIMIT = "10000";

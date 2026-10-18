@@ -2,8 +2,8 @@ import React from "react";
 
 function Profile() {
   return (
-    <div className="block py-2 px-4 text-gray-900 rounded hover:bg-gray-100">
-      <svg fill="none" viewBox="0 0 24 24" height="1em" width="1em">
+    <div className="inline-flex h-10 w-10 items-center justify-center rounded-md text-gray-800 hover:bg-gray-100">
+      <svg fill="none" viewBox="0 0 24 24" height="1.35em" width="1.35em" aria-hidden="true">
         <path
           fill="currentColor"
           fillRule="evenodd"

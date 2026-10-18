@@ -2,12 +2,22 @@ import bcrypt from "bcrypt";
 import { createClient } from "./client.js";
 import products from "./products.js";
 
+const LETTER_SIZES = ["XS", "S", "M", "L", "XL"];
+const WAIST_SIZES = ["28", "30", "32", "34", "36"];
+const sizesFor = (category) => {
+  if (["jeans", "trousers"].includes(category)) return WAIST_SIZES;
+  if (category === "accessories") return [];
+  return LETTER_SIZES;
+};
+
 const demoUser = {
   name: "Demo User",
   email: "demo@poscon.dev",
   pnum: "9999999999",
   password: "demo1234",
-  address: "221B Baker Street, Mumbai",
+  address: "221B Linking Road, Bandra West",
+  city: "Mumbai",
+  pincode: "400050",
 };
 
 // On a public deployment set ADMIN_PASSWORD so the admin account is not the documented demo one
@@ -34,14 +44,14 @@ async function seed() {
       }
     }
     await db.query("BEGIN");
-    await db.query("TRUNCATE payments, order_items, orders, cart, products, users RESTART IDENTITY CASCADE");
+    await db.query("TRUNCATE contact_messages, payments, order_items, orders, cart, products, users RESTART IDENTITY CASCADE");
 
     for (const [index, product] of products.entries()) {
       // Spread arrival dates so the newest products come last in the list
       const daysAgo = products.length - index;
       await db.query(
-        `INSERT INTO products (namee, description, img, price, sellprice, gender, category, is_bestseller, created_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW() - $9 * INTERVAL '1 day')`,
+        `INSERT INTO products (namee, description, img, price, sellprice, gender, category, is_bestseller, created_at, sizes)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW() - $9 * INTERVAL '1 day', $10)`,
         [
           product.namee,
           product.description,
@@ -52,14 +62,15 @@ async function seed() {
           product.category,
           product.bestseller || false,
           daysAgo,
+          sizesFor(product.category),
         ]
       );
     }
 
     const passhash = await bcrypt.hash(demoUser.password, 10);
     await db.query(
-      "INSERT INTO users (name, email, pnum, passhash, address) VALUES ($1, $2, $3, $4, $5)",
-      [demoUser.name, demoUser.email, demoUser.pnum, passhash, demoUser.address]
+      "INSERT INTO users (name, email, pnum, passhash, address, city, pincode) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+      [demoUser.name, demoUser.email, demoUser.pnum, passhash, demoUser.address, demoUser.city, demoUser.pincode]
     );
 
     const adminPasshash = await bcrypt.hash(adminUser.password, 10);

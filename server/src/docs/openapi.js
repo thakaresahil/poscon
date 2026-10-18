@@ -55,6 +55,7 @@ const openapi = {
     { name: "Cart", description: "The logged-in user's cart" },
     { name: "Orders", description: "Checkout, order history and simulated payments" },
     { name: "Admin", description: "Store management, admin role required" },
+    { name: "Contact", description: "Messages from the contact form" },
     { name: "Health", description: "Uptime checks" },
   ],
   paths: {
@@ -123,6 +124,57 @@ const openapi = {
           200: json(ref("Profile")),
           401: responses.Unauthorized,
           404: responses.NotFound,
+        },
+      },
+      patch: {
+        tags: ["Auth"],
+        summary: "Update name, phone number and saved delivery address",
+        description: "Replaces the saved details: optional fields that are left out or empty are cleared. The email cannot be changed.",
+        security: loggedIn,
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: ref("ProfileUpdate"),
+              example: { name: "Demo User", pnum: "9999999999", address: "221B Linking Road, Bandra West", city: "Mumbai", pincode: "400050" },
+            },
+          },
+        },
+        responses: {
+          200: json(ref("Profile"), "Profile updated"),
+          400: responses.BadRequest,
+          401: responses.Unauthorized,
+          404: responses.NotFound,
+          409: errorResponse("The phone number belongs to another account", "This phone number is already used by another account"),
+        },
+      },
+    },
+    "/profile/password": {
+      patch: {
+        tags: ["Auth"],
+        summary: "Change the password",
+        security: loggedIn,
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["currentPassword", "newPassword"],
+                properties: {
+                  currentPassword: { type: "string" },
+                  newPassword: { type: "string", minLength: 8, maxLength: 72 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: json({ type: "object", properties: { status: { type: "string", example: "Password changed" } } }),
+          400: errorResponse("Wrong current password or invalid new password", "Current password is incorrect"),
+          401: responses.Unauthorized,
+          404: responses.NotFound,
+          429: { $ref: "#/components/responses/TooManyRequests" },
         },
       },
     },
@@ -203,11 +255,13 @@ const openapi = {
       post: {
         tags: ["Cart"],
         summary: "Add a product to the cart",
-        description: "Adding a product that is already in the cart increases its quantity, up to 10.",
+        description:
+          "Adding a product that is already in the cart in the same size increases its quantity, up to 10. " +
+          "Products with sizes need a `size` from their `sizes` list.",
         security: loggedIn,
         requestBody: {
           required: true,
-          content: { "application/json": { schema: ref("AddToCartRequest"), example: { pid: 3, count: 2 } } },
+          content: { "application/json": { schema: ref("AddToCartRequest"), example: { pid: 3, count: 2, size: "M" } } },
         },
         responses: {
           201: json(
@@ -221,6 +275,7 @@ const openapi = {
                     id: { type: "integer" },
                     product_id: { type: "integer" },
                     quantity: { type: "integer" },
+                    size: { type: "string" },
                   },
                 },
               },
@@ -255,7 +310,12 @@ const openapi = {
         responses: {
           200: json({
             type: "object",
-            properties: { id: { type: "integer" }, product_id: { type: "integer" }, quantity: { type: "integer" } },
+            properties: {
+              id: { type: "integer" },
+              product_id: { type: "integer" },
+              quantity: { type: "integer" },
+              size: { type: "string" },
+            },
           }),
           400: responses.BadRequest,
           401: responses.Unauthorized,
@@ -389,6 +449,89 @@ const openapi = {
           ),
           404: responses.NotFound,
           409: errorResponse("The order is already paid", "Payment for this order is already complete"),
+        },
+      },
+    },
+    "/contact": {
+      post: {
+        tags: ["Contact"],
+        summary: "Send a message to the store",
+        description: "No login needed. Limited to 5 messages per 15 minutes from one address.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: ref("ContactRequest"),
+              example: { name: "Asha Rao", email: "asha@example.com", subject: "Order question", message: "When will my order ship?" },
+            },
+          },
+        },
+        responses: {
+          201: json(
+            {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "Sent" },
+                id: { type: "integer" },
+                created_at: { type: "string", format: "date-time" },
+              },
+            },
+            "Message saved"
+          ),
+          400: responses.BadRequest,
+          429: { $ref: "#/components/responses/TooManyRequests" },
+        },
+      },
+    },
+    "/admin/messages": {
+      get: {
+        tags: ["Admin"],
+        summary: "Messages from the contact form, newest first",
+        security: loggedIn,
+        parameters: [
+          { name: "status", in: "query", schema: { type: "string", enum: ["new", "read"] } },
+          { name: "page", in: "query", schema: { type: "integer", minimum: 1, default: 1 } },
+          { name: "limit", in: "query", schema: { type: "integer", minimum: 1, maximum: 50, default: 20 } },
+        ],
+        responses: {
+          200: json({
+            type: "object",
+            properties: {
+              messages: { type: "array", items: ref("ContactMessage") },
+              total: { type: "integer" },
+              unread: { type: "integer", description: "Messages with status new, ignoring the filter" },
+              page: { type: "integer" },
+              limit: { type: "integer" },
+              totalPages: { type: "integer" },
+            },
+          }),
+          400: responses.BadRequest,
+          401: responses.Unauthorized,
+          403: responses.Forbidden,
+        },
+      },
+    },
+    "/admin/messages/{id}": {
+      patch: {
+        tags: ["Admin"],
+        summary: "Mark a message as read or new",
+        security: loggedIn,
+        parameters: [idParam("Message id")],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { type: "object", required: ["status"], properties: { status: { type: "string", enum: ["new", "read"] } } },
+              example: { status: "read" },
+            },
+          },
+        },
+        responses: {
+          200: json({ type: "object", properties: { id: { type: "integer" }, status: { type: "string" } } }),
+          400: responses.BadRequest,
+          401: responses.Unauthorized,
+          403: responses.Forbidden,
+          404: responses.NotFound,
         },
       },
     },
@@ -550,6 +693,8 @@ const openapi = {
           email: { type: "string" },
           pnum: { type: "string", nullable: true },
           address: { type: "string", nullable: true },
+          city: { type: "string", nullable: true },
+          pincode: { type: "string", nullable: true },
           is_admin: { type: "boolean" },
         },
       },
@@ -565,6 +710,7 @@ const openapi = {
           gender: { type: "string", enum: ["men", "women"] },
           category: { type: "string", example: "shirts" },
           is_bestseller: { type: "boolean" },
+          sizes: { type: "array", items: { type: "string" }, description: "Empty when the product comes in one size", example: ["S", "M", "L"] },
           created_at: { type: "string", format: "date-time" },
         },
       },
@@ -603,6 +749,7 @@ const openapi = {
           gender: { type: "string", enum: ["men", "women"] },
           category: { type: "string", pattern: "^[a-z0-9-]{2,50}$" },
           is_bestseller: { type: "boolean", default: false },
+          sizes: { type: "array", items: { type: "string", maxLength: 10 }, maxItems: 12, default: [] },
         },
         example: {
           namee: "Festive Silk Saree",
@@ -613,6 +760,7 @@ const openapi = {
           gender: "women",
           category: "sarees",
           is_bestseller: false,
+          sizes: [],
         },
       },
       AddToCartRequest: {
@@ -621,6 +769,7 @@ const openapi = {
         properties: {
           pid: { type: "integer", description: "Product id" },
           count: { type: "integer", minimum: 1, maximum: 10 },
+          size: { type: "string", description: "Required when the product has sizes; one of its `sizes`" },
         },
       },
       CartItem: {
@@ -629,6 +778,7 @@ const openapi = {
           id: { type: "integer", description: "Cart item id" },
           product_id: { type: "integer" },
           quantity: { type: "integer" },
+          size: { type: "string", description: "Empty when the product has no sizes" },
           namee: { type: "string" },
           description: { type: "string" },
           img: { type: "string" },
@@ -690,6 +840,7 @@ const openapi = {
                 img: { type: "string" },
                 price: { type: "integer", description: "Price paid per item" },
                 quantity: { type: "integer" },
+                size: { type: "string" },
               },
             },
           },
@@ -740,6 +891,39 @@ const openapi = {
         ],
         discriminator: { propertyName: "method" },
       },
+      ProfileUpdate: {
+        type: "object",
+        required: ["pnum"],
+        properties: {
+          name: { type: "string", maxLength: 100 },
+          pnum: { type: "string", pattern: "^\\d{10}$" },
+          address: { type: "string", maxLength: 255 },
+          city: { type: "string", maxLength: 100 },
+          pincode: { type: "string", description: "6 digits, or empty to clear" },
+        },
+      },
+      ContactRequest: {
+        type: "object",
+        required: ["name", "email", "message"],
+        properties: {
+          name: { type: "string", minLength: 2, maxLength: 100 },
+          email: { type: "string", format: "email" },
+          subject: { type: "string", maxLength: 150 },
+          message: { type: "string", minLength: 10, maxLength: 2000 },
+        },
+      },
+      ContactMessage: {
+        type: "object",
+        properties: {
+          id: { type: "integer" },
+          name: { type: "string" },
+          email: { type: "string" },
+          subject: { type: "string" },
+          message: { type: "string" },
+          status: { type: "string", enum: ["new", "read"] },
+          created_at: { type: "string", format: "date-time" },
+        },
+      },
       AdminOrder: {
         type: "object",
         properties: {
@@ -763,6 +947,7 @@ const openapi = {
           orders_to_ship: { type: "integer" },
           customers: { type: "integer" },
           products: { type: "integer" },
+          new_messages: { type: "integer", description: "Unread contact form messages" },
           daily: {
             type: "array",
             description: "One entry per day for the last 30 days",

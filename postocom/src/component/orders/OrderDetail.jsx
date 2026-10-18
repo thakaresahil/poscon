@@ -84,7 +84,7 @@ function OrderDetail() {
           </p>
           <Link
             to={`/orders/${order.id}/pay`}
-            className="px-6 py-2 bg-red-500 text-white rounded-md transition-transform duration-300 hover:scale-105"
+            className="btn btn-primary"
           >
             Pay Now
           </Link>
@@ -104,7 +104,7 @@ function OrderDetail() {
                 <p>{item.product_name}</p>
               )}
               <p className="text-gray-500 text-sm">
-                ₹{item.price} x {item.quantity}
+                {item.size ? `Size ${item.size} · ` : ""}₹{item.price} x {item.quantity}
               </p>
             </div>
             <p className="font-semibold">₹{item.price * item.quantity}</p>
@@ -146,7 +146,7 @@ function OrderDetail() {
         </div>
       )}
 
-      <Link to="/orders" className="text-blue-600 hover:underline">
+      <Link to="/orders" className="link">
         ← Back to My Orders
       </Link>
     </div>

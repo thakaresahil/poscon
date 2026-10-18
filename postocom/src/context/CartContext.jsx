@@ -10,10 +10,13 @@ export function CartProvider({ children }) {
   const { isLoggedIn } = useAuth();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
+  // False until the first load of the cart finishes, so pages do not treat it as empty too early
+  const [ready, setReady] = useState(false);
 
   const refreshCart = useCallback(async () => {
     if (!isLoggedIn) {
       setItems([]);
+      setReady(true);
       return;
     }
     setLoading(true);
@@ -24,15 +27,17 @@ export function CartProvider({ children }) {
       console.error("Error fetching cart", error);
     } finally {
       setLoading(false);
+      setReady(true);
     }
   }, [isLoggedIn]);
 
   useEffect(() => {
+    setReady(false);
     refreshCart();
   }, [refreshCart]);
 
-  const addItem = async (pid, count) => {
-    await api.post("/addtocart", { pid, count });
+  const addItem = async (pid, count, size = "") => {
+    await api.post("/addtocart", { pid, count, size });
     await refreshCart();
   };
 
@@ -62,6 +67,7 @@ export function CartProvider({ children }) {
   const value = {
     items,
     loading,
+    ready,
     count,
     total,
     refreshCart,

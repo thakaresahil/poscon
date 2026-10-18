@@ -17,6 +17,7 @@ export const loginSchema = z.object({
 export const addToCartSchema = z.object({
   pid: z.coerce.number().int().positive(),
   count: z.coerce.number().int().min(1, quantityMessage).max(10, quantityMessage),
+  size: z.string().trim().toUpperCase().max(10).default(""),
 });
 
 export const updateCartSchema = z.object({
@@ -111,6 +112,11 @@ export const productSchema = z
       .toLowerCase()
       .regex(/^[a-z0-9-]{2,50}$/, "Category can only use letters, numbers and dashes"),
     is_bestseller: z.boolean().default(false),
+    sizes: z
+      .array(z.string().trim().toUpperCase().min(1).max(10, "Sizes can be up to 10 characters"))
+      .max(12, "A product can have up to 12 sizes")
+      .default([])
+      .transform((sizes) => [...new Set(sizes)]),
   })
   .refine((product) => product.sellprice <= product.price, {
     message: "Sale price cannot be more than the original price",
@@ -127,3 +133,57 @@ export const adminOrderQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });
+
+export const contactSchema = z.object({
+  name: z.string().trim().min(2, "Please enter your name").max(100),
+  email: z.string().trim().toLowerCase().email("Please enter a valid email"),
+  subject: z.string().trim().max(150).default(""),
+  message: z
+    .string()
+    .trim()
+    .min(10, "Please write at least 10 characters")
+    .max(2000, "Messages can be up to 2000 characters"),
+});
+
+export const messageQuerySchema = z.object({
+  status: z.enum(["new", "read"], { message: "Status must be new or read" }).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+});
+
+export const messageStatusSchema = z.object({
+  status: z.enum(["new", "read"], { message: "Status must be new or read" }),
+});
+
+// Empty strings clear optional profile fields
+const optionalText = (max, message) =>
+  z
+    .string()
+    .trim()
+    .max(max, message)
+    .transform((value) => value || null)
+    .nullable()
+    .optional();
+
+export const profileSchema = z.object({
+  name: optionalText(100, "Name can be up to 100 characters"),
+  pnum: z.string().trim().regex(/^\d{10}$/, "Phone number must be 10 digits"),
+  address: optionalText(255, "Address can be up to 255 characters"),
+  city: optionalText(100, "City can be up to 100 characters"),
+  pincode: z
+    .string()
+    .trim()
+    .refine((value) => value === "" || /^\d{6}$/.test(value), "Pincode must be 6 digits")
+    .transform((value) => value || null)
+    .nullable()
+    .optional(),
+});
+
+export const passwordChangeSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Please enter your current password"),
+    newPassword: z.string().min(8, "New password must be at least 8 characters").max(72),
+  })
+  .refine((body) => body.currentPassword !== body.newPassword, {
+    message: "New password must be different from the current one",
+  });

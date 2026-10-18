@@ -1,114 +1,81 @@
 import api from "../../api/client";
 import { useState } from "react";
-import { Dialog } from "@mui/material";
 import { useAuth } from "../../context/AuthContext";
+import AuthDialog from "./AuthDialog";
+import PasswordInput from "./PasswordInput";
 
 function Login({ open, handleClose, handleRegister }) {
-  const { login } = useAuth();
-
-  const [logindata, setData] = useState({
-    email: "",
-    password: "",
-  });
-  const [wrongpassword, setWrongPassword] = useState("");
-  const [redirecttosignup, setRedirecttosignup] = useState("");
+  const { login, openForgotPassword } = useAuth();
+  const [logindata, setData] = useState({ email: "", password: "" });
   const [formError, setFormError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
   function handlechange(event) {
-    setData({
-      ...logindata,
-      [event.target.name]: event.target.value,
-    });
+    setData({ ...logindata, [event.target.name]: event.target.value });
   }
 
-  function loggerin() {
+  function handlesubmit(event) {
+    event.preventDefault();
     setFormError("");
-    for (const key in logindata) {
-      if (logindata[key] === "") {
-        setFormError("Please fill out all fields.");
-        return;
-      }
+    if (!logindata.email || !logindata.password) {
+      setFormError("Please fill out all fields.");
+      return;
     }
+    setSubmitting(true);
     api
       .post("/login", logindata)
       .then((response) => {
         login(response.data.token, response.data.uid);
       })
       .catch((error) => {
-        setFormError(
-          error.response?.data?.error || "Something went wrong, please try again."
-        );
+        setFormError(error.response?.data?.error || "Something went wrong, please try again.");
+        setSubmitting(false);
       });
   }
 
-  function handlesubmit(event) {
-    event.preventDefault();
-    setRedirecttosignup("");
-    setWrongPassword("");
-    loggerin();
-  }
-
   return (
-    <Dialog open={open}>
-      <div className="flex justify-center items-center">
-        <form
-          className="bg-white px-6 py-8 rounded shadow-md text-black w-96"
-          onSubmit={handlesubmit}
-        >
-          <h1 className="mb-8 text-3xl text-center">Log In</h1>
-          <button className="absolute top-2 right-2 " onClick={handleClose}>
-            ❌
-          </button>
+    <AuthDialog open={open} onClose={handleClose} title="Log In" subtitle="Welcome back to Poscon.">
+      <form className="flex flex-col gap-4" onSubmit={handlesubmit} noValidate>
+        <div>
+          <label htmlFor="login-email" className="label">Email</label>
           <input
-            type="text"
-            className="block border border-grey-light w-full p-3 rounded mb-4 hover:shadow-lg font-medium transition transform hover:-translate-y-0.5"
+            id="login-email"
+            type="email"
+            className="input"
             name="email"
             placeholder="Email"
+            autoComplete="email"
             onChange={handlechange}
             value={logindata.email}
-            required
           />
-
-          <input
-            type="password"
-            className="block border border-grey-light w-full p-3 rounded mb-4 hover:shadow-lg font-medium transition transform hover:-translate-y-0.5"
-            name="password"
-            placeholder="Password"
-            onChange={handlechange}
-            value={logindata.password}
-            required
-          />
-          {wrongpassword && (
-            <p className="text-red-700 text-sm w-full mx-auto">
-              {wrongpassword}
-            </p>
-          )}
-          {redirecttosignup && (
-            <p className="text-red-700 text-sm w-full mx-auto">
-              {redirecttosignup}
-            </p>
-          )}
-          {formError && (
-            <p className="text-red-700 text-sm w-full mx-auto">{formError}</p>
-          )}
-          <button
-            onClick={handlesubmit}
-            type="submit"
-            className="w-full text-center py-3 rounded  bg-red-500 text-white hover:bg-red-600 focus:outline-none my-1 hover:shadow-lg font-medium transition transform hover:-translate-y-0.5"
-          >
-            Log In
+        </div>
+        <PasswordInput
+          id="login-password"
+          name="password"
+          label="Password"
+          autoComplete="current-password"
+          value={logindata.password}
+          onChange={handlechange}
+        />
+        <button type="button" className="link -mt-2 self-end text-sm" onClick={openForgotPassword}>
+          Forgot password?
+        </button>
+        {formError && <p className="field-error" role="alert">{formError}</p>}
+        <button type="submit" className="btn btn-primary w-full" disabled={submitting}>
+          {submitting ? "Logging in..." : "Log In"}
+        </button>
+        <p className="rounded-md bg-gray-50 p-3 text-sm text-gray-600">
+          Demo account: <span className="font-medium text-gray-900">demo@poscon.dev</span> /{" "}
+          <span className="font-medium text-gray-900">demo1234</span>
+        </p>
+        <p className="text-center text-sm text-gray-600">
+          New to Poscon?{" "}
+          <button type="button" className="link" onClick={handleRegister}>
+            Create an account
           </button>
-          {/* </div> */}
-          <div className="text-grey-dark mt-6">
-            <p>
-              Create account{" "}
-              <button className="text-blue-600" onClick={handleRegister}>
-                here.
-              </button>
-            </p>
-          </div>
-        </form>
-      </div>
-    </Dialog>
+        </p>
+      </form>
+    </AuthDialog>
   );
 }
 

@@ -6,7 +6,7 @@ test("an admin adds a product and ships a customer's order", async ({ page, requ
   const login = await request.post(`${API_URL}/login`, { data: demoCustomer });
   const { token } = await login.json();
   const headers = { Authorization: `Bearer ${token}` };
-  await request.post(`${API_URL}/addtocart`, { headers, data: { pid: 2, count: 1 } });
+  await request.post(`${API_URL}/addtocart`, { headers, data: { pid: 2, count: 1, size: "M" } });
   const orderResponse = await request.post(`${API_URL}/orders`, {
     headers,
     data: { name: "Demo User", phone: "9999999999", address: "221B Baker Street", city: "Mumbai", pincode: "400001" },
@@ -38,13 +38,13 @@ test("an admin adds a product and ships a customer's order", async ({ page, requ
     await page.goto("/admin/orders");
     const row = page.getByRole("row").filter({ hasText: orderNumber });
     await row.getByRole("combobox").selectOption("shipped");
-    await expect(row.getByText("Shipped")).toBeVisible();
+    await expect(row.getByText("Shipped", { exact: true })).toBeVisible();
   });
 
   await test.step("the customer sees the new status", async () => {
     await page.getByRole("button", { name: "Log Out" }).click();
     await logIn(page, demoCustomer);
     await page.goto(`/orders/${order.id}`);
-    await expect(page.getByText("Shipped")).toBeVisible();
+    await expect(page.getByText("Shipped", { exact: true })).toBeVisible();
   });
 });
