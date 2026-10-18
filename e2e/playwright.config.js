@@ -20,7 +20,8 @@ export default defineConfig({
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: [
     {
-      command: "npm start",
+      // The API checks the database as soon as it starts, so build the test database first
+      command: "npm run db:reset:test && npm start",
       cwd: "../server",
       url: `http://localhost:${API_PORT}/data`,
       reuseExistingServer: !process.env.CI,

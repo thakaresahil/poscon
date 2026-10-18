@@ -56,7 +56,7 @@ Poscon is a full-stack e-commerce store for clothing and accessories. Shoppers c
 | Layer    | Technology                                           |
 | :------- | :--------------------------------------------------- |
 | Frontend | React 18, React Router, Tailwind CSS, MUI, Axios      |
-| Backend  | Node.js, Express, JSON Web Tokens, bcrypt, zod        |
+| Backend  | Node.js, Express, JSON Web Tokens, bcrypt, zod, OpenAPI / Swagger UI |
 | Testing  | Jest, Supertest, React Testing Library, Playwright    |
 | DevOps   | Docker, Docker Compose, nginx, GitHub Actions         |
 | Database | PostgreSQL                                            |
@@ -85,6 +85,7 @@ poscon/
 │   │   ├── controllers/   # Request handlers
 │   │   ├── middleware/    # Auth, validation, rate limiting, errors
 │   │   ├── validation/    # zod request schemas
+│   │   ├── docs/          # OpenAPI spec served at /docs
 │   │   └── utils/
 │   ├── tests/             # Jest + Supertest API tests
 │   └── db/
@@ -212,7 +213,7 @@ Run these inside `server/`:
 
 | Suite | Tool | What it covers | Command |
 | :---- | :--- | :------------- | :------ |
-| API | Jest + Supertest | 85 tests: auth, products and search, cart, orders, payments, admin access, plus unit tests for the payment helpers | `cd server && npm test` |
+| API | Jest + Supertest | 93 tests: auth, products and search, cart, orders, payments, admin access, API docs accuracy, plus unit tests for the payment helpers | `cd server && npm test` |
 | Frontend | Jest + React Testing Library | Card helpers, formatting and the product card component | `cd postocom && npm test` |
 | End to end | Playwright | Full journeys in a real browser: sign up, search, cart, checkout, declined and successful payment, order history, admin adding a product and shipping an order, protected pages | `cd e2e && npm test` |
 
@@ -245,6 +246,10 @@ npm test
 Playwright starts the API on port 9100 and the frontend on port 3100 by itself, so it can run alongside a local dev setup.
 
 ## API Reference
+
+**Interactive docs:** with the API running, open [`http://localhost:9000/docs`](http://localhost:9000/docs) for Swagger UI. Every endpoint can be tried from the browser: run `POST /login` with a demo account, click **Authorize** and paste the token to call protected and admin endpoints. The raw OpenAPI 3 spec is at `/docs/openapi.json`.
+
+A test checks that the spec lists exactly the routes the server has and that real responses match the documented fields, so the docs cannot drift out of date.
 
 Endpoints marked 🔒 need an `Authorization: Bearer <token>` header, which the frontend sends automatically after login.
 
@@ -336,7 +341,7 @@ Use any name, any future expiry date and any 3 digit CVV. A declined payment lea
 - [x] Automated tests
 - [x] CI pipeline
 - [x] Docker setup
-- [ ] API docs
+- [x] API docs (OpenAPI + Swagger UI)
 - [ ] Live deployment
 
 ## License
