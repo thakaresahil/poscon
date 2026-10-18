@@ -20,7 +20,7 @@ function Register({ open, handleClose, handleLoginComponent}) {
   const [signupdata, setData] = useState({
     email: "",
     pnum: "",
-    passhash: "",
+    password: "",
     confirm_password: "",
   });
 
@@ -46,29 +46,24 @@ function Register({ open, handleClose, handleLoginComponent}) {
     }
 
     if (signupdata.password === signupdata.confirm_password) {
+      const { confirm_password, ...newUser } = signupdata;
       axios
-        .post("http://localhost:9000/signup/user", signupdata, {
+        .post("http://localhost:9000/signup/user", newUser, {
           headers: {
             "Content-Type": "application/json",
           },
         })
-        .then((response) => {
-          try {
-            const result = response.data;
-            const neednavigate = result.route;
-            if (neednavigate === "login") {
-              console.log(result);
-              setRedirecttologin("Already Signup, Please Login!");
-            } else {
-              console.log("registration successfull");
-              handleLoginComponent();
-            }
-          } catch (error) {
-            console.error("Error parsing JSON:", error);
-          }
+        .then(() => {
+          handleLoginComponent();
         })
         .catch((error) => {
-          console.error("Error making the request:", error);
+          if (error.response?.status === 409) {
+            setRedirecttologin("Already Signup, Please Login!");
+          } else {
+            setFormError(
+              error.response?.data?.error || "Something went wrong, please try again."
+            );
+          }
         });
     } else {
       setPasswordError("Password and Confirm Password do not match");
@@ -109,10 +104,10 @@ function Register({ open, handleClose, handleLoginComponent}) {
             <input
               type="password"
               className="block border border-grey-light w-full p-3 rounded mb-4 hover:shadow-lg font-medium transition transform hover:-translate-y-0.5"
-              name="passhash"
+              name="password"
               placeholder="Password"
               onChange={handlechange}
-              value={signupdata.passhash}
+              value={signupdata.password}
               required
             />
             <input

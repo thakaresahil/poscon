@@ -9,19 +9,72 @@ import fs from "fs";
 import util from "util";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import { z } from "zod";
+
+env.config();
 
 const app = express();
 const port = 9000;
 const saltRounds = 10;
-app.use(cors());
+const secretKey = process.env.SESSION_SECRET;
 
-env.config();
+if (!secretKey) {
+  console.error("SESSION_SECRET is not set");
+  process.exit(1);
+}
 
-app.use(bodyParser.json());
+const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:3000")
+  .split(",")
+  .map((origin) => origin.trim());
+
+app.use(helmet());
+app.use(cors({ origin: allowedOrigins }));
+
+app.use(bodyParser.json({ limit: "10kb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.static("public"));
-const secretKey = process.env.SESSION_SECRET;
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many attempts, please try again later" },
+});
+
+const signupSchema = z.object({
+  email: z.string().trim().toLowerCase().email(),
+  pnum: z.string().trim().regex(/^\d{10}$/, "Phone number must be 10 digits"),
+  password: z.string().min(8, "Password must be at least 8 characters").max(72),
+});
+
+const loginSchema = z.object({
+  email: z.string().trim().toLowerCase().email(),
+  password: z.string().min(1).max(72),
+});
+
+const addToCartSchema = z.object({
+  pid: z.coerce.number().int().positive(),
+  count: z.coerce.number().int().min(1).max(10),
+});
+
+const buyItemSchema = z.object({
+  pid: z.array(z.coerce.number().int().positive()).min(1),
+});
+
+const validate = (schema) => (req, res, next) => {
+  const result = schema.safeParse(req.body);
+  if (!result.success) {
+    return res
+      .status(400)
+      .json({ error: result.error.issues[0]?.message || "Invalid input" });
+  }
+  req.body = result.data;
+  next();
+};
 
 const db = new pg.Client({
   user: process.env.PG_USER,
@@ -56,7 +109,7 @@ async function deleteFile(filePath) {
 }
 
 const generateToken = (user) => {
-  return jwt.sign({ id: user.id }, secretKey, { expiresIn: "30d" });
+  return jwt.sign({ id: user.id }, secretKey, { expiresIn: "7d" });
 };
 
 const verifyToken = (token) => {
@@ -68,11 +121,15 @@ const verifyToken = (token) => {
 };
 
 const authenticateToken = (req, res, next) => {
-  const token = req.body.token;
-  if (!token) return res.sendStatus(401);
+  const [scheme, token] = (req.headers.authorization || "").split(" ");
+  if (scheme !== "Bearer" || !token) {
+    return res.status(401).json({ error: "Please log in" });
+  }
 
   const verifiedUser = verifyToken(token);
-  if (!verifiedUser) return res.sendStatus(403);
+  if (!verifiedUser) {
+    return res.status(401).json({ error: "Session expired, please log in again" });
+  }
 
   req.user = verifiedUser;
   next();
@@ -145,131 +202,123 @@ app.get("/browseproducts/access", async (req, res) => {
   }
 });
 
-app.get("/profile/:uid", async (req, res) => {
-  const uid = req.params.uid;
+app.get("/profile", authenticateToken, async (req, res) => {
   try {
-    const udata = await db.query("SELECT * FROM users WHERE id = $1", [uid]);
-    // console.log(udata);
-    return res.json(udata.rows[0]).end();
+    const udata = await db.query(
+      "SELECT id, name, email, pnum, address FROM users WHERE id = $1",
+      [req.user.id]
+    );
+    if (udata.rowCount === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    return res.json(udata.rows[0]);
   } catch (error) {
     console.error(error);
-    return res.json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-app.post("/cartdata", authenticateToken, async (req, res) => {
-  const cart = req.body.uid;
+app.get("/cartdata", authenticateToken, async (req, res) => {
   try {
-    // const cartdata = await db.query("SELECT product_id FROM cart WHERE user_id = $1", [cart]);
-    // const cartitems = [];
-    // console.log(cartdata.rows);
-    // for(const row of cartdata.rows) {
-    //   const pid = row.product_id;
-    //   const response = await db.query("SELECT * FROM products WHERE id = $1",[pid]);
-    // cartitems.push(response.rows[0]);
-    // }
-    const cartdataa = await db.query(
-      "SELECT * FROM cart INNER JOIN products on cart.product_id = products.id WHERE user_id = $1 and status = 0",
-      [cart]
+    const cartdata = await db.query(
+      `SELECT cart.id, cart.product_id, cart.quantity, products.namee, products.description,
+              products.img, products.price, products.sellprice, products.gender, products.category
+       FROM cart INNER JOIN products ON cart.product_id = products.id
+       WHERE cart.user_id = $1 AND cart.status = 0
+       ORDER BY cart.created_at`,
+      [req.user.id]
+    );
+    return res.json(cartdata.rows);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.patch("/buyitem", authenticateToken, validate(buyItemSchema), async (req, res) => {
+  const { pid } = req.body;
+  try {
+    const result = await db.query(
+      "UPDATE cart SET status = 1 WHERE user_id = $1 AND status = 0 AND product_id = ANY($2::int[])",
+      [req.user.id, pid]
     );
 
-    return res.json(cartdataa.rows).end();
-  } catch (error) {
-    console.error(error);
-    return res.json({ error: "Internal Server Error" });
-  }
-});
-
-app.patch("/buyitem", authenticateToken, async (req, res) => {
-  const { pid, uid } = req.body;
-  console.log(pid, uid);
-  // Ensure pid is an array and not empty
-  if (!Array.isArray(pid) || pid.length === 0) {
-    return res.status(400).json({ error: "Invalid product IDs" });
-  }
-  try {
-    const result = await db.query(`UPDATE cart SET status = 1 WHERE user_id = $1 AND product_id = ANY($2::int[])`,
-      [uid, pid]
-    );
-
-    if(result.rowCount>0){
-      return res.json({status: "buyed"})
-    }
-    else{
-      return res.status(404).json({error: "Cart is empty"})
-    }
-
-  } catch (error) {
-    console.error(error);
-    return res.json({ error: "Internal Server Error" });
-  }
-});
-
-app.post("/signup/user", async (req, res) => {
-  const phonenumber = req.body.phonenumber;
-  const email = req.body.email;
-  const password = req.body.password;
-
-  const hashPassword = await bcrypt.hash(password, saltRounds);
-
-  try {
-    const isUser = await db.query("SELECT * FROM users WHERE email = $1", [
-      email,
-    ]);
-
-    if (isUser.rowCount > 0) {
-      console.log("User already exists");
-      return res.json({ error: "User already exists" });
+    if (result.rowCount > 0) {
+      return res.json({ status: "buyed" });
     } else {
-      const result = await db.query(
-        "INSERT INTO users (pnum, email, passhash) VALUES ($1, $2, $3) RETURNING *",
-        [phonenumber, email, hashPassword]
-      );
-      console.log(result);
-      const user = result.rows[0];
-      res.status(201).json(user);
+      return res.status(404).json({ error: "Cart is empty" });
     }
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-app.post("/addtocart", authenticateToken, async (req, res) => {
-  const uid = req.body.uid;
-  const pid = req.body.pid;
-  const count = req.body.count;
+app.post("/signup/user", authLimiter, validate(signupSchema), async (req, res) => {
+  const { email, pnum, password } = req.body;
+  try {
+    const isUser = await db.query(
+      "SELECT id FROM users WHERE email = $1 OR pnum = $2",
+      [email, pnum]
+    );
+    if (isUser.rowCount > 0) {
+      return res.status(409).json({ error: "User already exists" });
+    }
+
+    const hashPassword = await bcrypt.hash(password, saltRounds);
+    const result = await db.query(
+      "INSERT INTO users (pnum, email, passhash) VALUES ($1, $2, $3) RETURNING id, email, pnum",
+      [pnum, email, hashPassword]
+    );
+    return res.status(201).json(result.rows[0]);
+  } catch (error) {
+    if (error.code === "23505") {
+      return res.status(409).json({ error: "User already exists" });
+    }
+    console.error(error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/addtocart", authenticateToken, validate(addToCartSchema), async (req, res) => {
+  const { pid, count } = req.body;
   try {
     await db.query(
       "INSERT INTO cart (user_id, product_id, quantity) VALUES ($1, $2, $3)",
-      [uid, pid, count]
+      [req.user.id, pid, count]
     );
     return res.status(201).json({ status: "Added" });
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    if (error.code === "23503") {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    console.error(error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 
-app.post("/login", async (req, res) => {
+app.post("/login", authLimiter, validate(loginSchema), async (req, res) => {
   const { email, password } = req.body;
   try {
-    const result = await db.query("SELECT * FROM users WHERE email = $1", [
-      email,
-    ]);
+    const result = await db.query(
+      "SELECT id, passhash FROM users WHERE email = $1",
+      [email]
+    );
     const user = result.rows[0];
 
     if (user && (await bcrypt.compare(password, user.passhash))) {
       const token = generateToken(user);
-      res.json({ token, uid: user.id });
-    } else {
-      res.json({ error: "Invalid credentials" });
+      return res.json({ token, uid: user.id });
     }
+    return res.status(401).json({ error: "Invalid email or password" });
   } catch (error) {
-    res.status(500).json({ error: error.meggase });
+    console.error(error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 
 app.get("/protected", authenticateToken, (req, res) => {
-  res.json({ message: "Thie is a protected route", user: req.user });
+  res.json({ message: "This is a protected route", user: req.user });
 });
 
 app.listen(port, () => {
