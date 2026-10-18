@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../../api/client";
 import React, { useEffect, useState } from "react";
 import Cards from "../cards/Cards";
 import { useNavigate } from "react-router-dom";
@@ -23,9 +23,7 @@ function Productbrowse() {
 
   const fetchProductData = async (gender) => {
     try {
-      const response = await axios.get(
-        `http://localhost:9000/browseproducts/${gender}`
-      );
+      const response = await api.get(`/browseproducts/${gender}`);
       setProductData(response.data);
     } catch (error) {
       console.error("Error Fetching Data: " + error);
@@ -64,26 +62,8 @@ function Productbrowse() {
 
   const addtocart = async (cart) => {
     try {
-      await axios.post(
-        `http://localhost:9000/addtocart`,
-        cart,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${tokencheck}`,
-          },
-        }
-      ).then((response) => {
-        try {
-          const result = response.data;
-          console.log(result);
-          navigate("/cart");
-        } catch (error) {
-          console.error("Error parsing JSON:", error);
-        }
-      })
-      ;
-
+      await api.post("/addtocart", cart);
+      navigate("/cart");
     } catch (error) {
       console.error("Error Fetching Data: " + error);
     }

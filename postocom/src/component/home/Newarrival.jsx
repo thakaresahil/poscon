@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../../api/client";
 import { useEffect, useState } from "react";
 import Cards from "../cards/Cards";
 import Loading from "../loading/Loading";
@@ -20,7 +20,7 @@ function Newarrival() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:9000/data");
+        const response = await api.get("/data");
         setNewarrival(response.data);
       } catch (error) {
         console.error("Error fetching data", error);

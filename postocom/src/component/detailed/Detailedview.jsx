@@ -39,9 +39,9 @@ function Detailedview({
           <p>FREE DELIVERY</p>
         </div>
         <div className="flex justify-start gap-4">
-          <p className="text-gray-300 line-through">${orgprice}</p>
+          <p className="text-gray-300 line-through">₹{orgprice}</p>
           <p className="font-semibold ">
-            At ${sellprice}
+            At ₹{sellprice}
             <span className="text-base text-red-300">
               ({discPercents}% OFF)
             </span>
