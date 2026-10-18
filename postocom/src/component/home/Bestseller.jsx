@@ -32,7 +32,7 @@ function Bestseller() {
           <div className="col-span-full"><Loading /></div>
         ) : (
           bsell.length > 0 ? (
-            bsell.map((newItem) => (
+            bsell.slice(0, 8).map((newItem) => (
               <Cards
                 key={newItem.id}
                 id={newItem.id}
