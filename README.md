@@ -1,86 +1,193 @@
-
 # Poscon
 
- This project is a full-featured E-Commerce Website designed to provide a seamless online shopping experience. It includes a PostgreSQL database schema for storing user and product information, and a full-stack application to manage user interactions, product listings, and secure transactions. The project ensures the security of sensitive data by implementing password hashing and unique constraints on key fields like email and mobile number.
+Poscon is a full-stack e-commerce store for clothing and accessories. Shoppers can browse products by category, view product details, sign up and log in, add items to a cart and check out.
 
-## More about CRUD
+**Live demo:** _coming soon_
 
-* CRUD refers to the four functions that are considered necessary to implement a persistent storage application: create, read, update and delete.
-* CRUD acronym identifies all of the major functions that are inherent to databases.
-## Technology Used
+**Demo account:** `demo@poscon.dev` / `demo1234` (created by the seed script)
 
-**Client:** React, TailwindCSS
+![Home page](demo/Home.png)
 
-**Server:** Node, Express
+## Features
 
-**Database:** ProstgreSQL
+- Product catalogue for men, women, accessories and new arrivals, with a bestsellers section on the home page
+- Product detail view with discount pricing and quantity selection
+- Account signup and login with hashed passwords (bcrypt) and JWT authentication
+- Cart and checkout tied to the logged-in user
+- Profile page for the logged-in user
+- Database migrations and seed data, so the whole app can be set up with one command
+
+### Security
+
+- The user is always identified from the JWT, never from the request body
+- Tokens are sent in the `Authorization: Bearer` header and expire after 7 days
+- Every request body is validated with zod
+- Login and signup are rate limited
+- Security headers with helmet, and CORS restricted to the frontend URL
+- Password hashes are never returned by the API
+
+## Tech Stack
+
+| Layer    | Technology                                           |
+| :------- | :--------------------------------------------------- |
+| Frontend | React 18, React Router, Tailwind CSS, MUI, Axios      |
+| Backend  | Node.js, Express, JSON Web Tokens, bcrypt, zod        |
+| Database | PostgreSQL                                            |
+
+## Architecture
+
+```mermaid
+flowchart LR
+    Browser["React app<br/>(postocom)"] -- "REST + JWT" --> API["Express API<br/>(server)"]
+    API -- "SQL" --> DB[("PostgreSQL")]
+```
+
+```
+poscon/
+├── postocom/              # React frontend
+│   └── src/
+│       ├── api/client.js  # Shared axios client (base URL + auth header)
+│       └── component/     # Pages and UI components
+├── server/                # Express API
+│   ├── server.js          # Routes, auth and validation
+│   └── db/
+│       ├── migrations/    # SQL schema, applied in order
+│       ├── migrate.js     # Migration runner
+│       ├── seed.js        # Sample products and demo user
+│       └── products.js    # Seed product data
+└── demo/                  # Screenshots
+```
+
+### Database
+
+| Table        | Purpose                                                        |
+| :----------- | :------------------------------------------------------------- |
+| `users`      | Accounts with email, phone number and bcrypt password hash     |
+| `products`   | Catalogue with price, sale price, gender, category, bestseller flag |
+| `cart`       | Items a user has added (`status` 0 = in cart, 1 = purchased)    |
+| `bestseller` | View over `products` where the bestseller flag is set          |
 
 ## Getting Started
 
-Prerequisites Node.js and npm installed PostgreSQL installed and running Installation
+### Prerequisites
 
-To clone this repository
+- Node.js 18 or newer
+- PostgreSQL 14 or newer, running locally
 
-```bash
-  git clone https://github.com/thakaresahil/poscon.git
-```
-
-```bash
-  cd poscon
-```
-
-## Install dependencies
+### 1. Clone the repository
 
 ```bash
-  npm install
+git clone https://github.com/thakaresahil/poscon.git
+cd poscon
 ```
-## License
 
-License This project is licensed under the MIT License.
+### 2. Set up the API
 
+```bash
+cd server
+npm install
+cp .env.example .env
+```
 
-## Endpoints
+Edit `.env` with your PostgreSQL details and a long random `SESSION_SECRET`, then create the database and load the sample data:
 
-### Front-End
+```bash
+createdb poscon
+npm run db:reset
+npm run dev
+```
 
-| HTTP Methode | URL     | Description                |
-| :-------- | :------- | :------------------------- |
-| `get` | `http://localhost:3000/` | Home Page |
-| `get` | `http://localhost:3000/browseproduct` | Browse Products |
-| `get` | `http://localhost:3000/profile` | Profile |
-| `get` | `http://localhost:3000/about` | About |
-| `get` | `http://localhost:3000/cart` | Cart |
-| `get` | `http://localhost:3000/contact` | contact |
+The API runs on `http://localhost:9000`.
 
-### Back-End Server
+### 3. Set up the frontend
 
-| HTTP Methode | URL     | Description                |
-| :-------- | :------- | :------------------------- |
-| `get` | `http://localhost:9000/data` | get product data |
-| `get` | `http://localhost:9000/home/bestseller` | get the bestseller |
-| `get` | `http://localhost:9000/browseproducts/women` | women products |
-| `get` | `http://localhost:9000/browseproducts/men` | men products |
-| `get` | `http://localhost:9000/browseproducts/access` | Retrieve Accessories |
-| `get` | `http://localhost:9000/browseproducts/newarrivals` | Retrieve New Arrivals |
-| `post` | `http://localhost:9000/signup/user` | user registration |
-| `post` | `http://localhost:9000/login` | user login |
-| `post` | `http://localhost:9000/cartdata` | Retrieve Cart Info |
-| `post` | `http://localhost:9000/addtocart` | item stored to cart |
-| `patch` | `http://localhost:9000/buyitem` | item purchased |
+In a new terminal:
+
+```bash
+cd postocom
+npm install
+cp .env.example .env
+npm start
+```
+
+The app opens at `http://localhost:3000`.
+
+### Environment variables
+
+**server/.env**
+
+| Variable         | Description                                         |
+| :--------------- | :-------------------------------------------------- |
+| `PG_USER`        | PostgreSQL user                                     |
+| `PG_HOST`        | PostgreSQL host                                     |
+| `PG_DATABASE`    | Database name                                       |
+| `PG_PASSWORD`    | PostgreSQL password                                 |
+| `PG_PORT`        | PostgreSQL port                                     |
+| `PORT`           | Port the API listens on (default `9000`)            |
+| `CLIENT_ORIGIN`  | Frontend URL(s) allowed by CORS, comma separated    |
+| `SESSION_SECRET` | Secret used to sign JWTs                            |
+
+**postocom/.env**
+
+| Variable            | Description                                   |
+| :------------------ | :-------------------------------------------- |
+| `REACT_APP_API_URL` | URL of the API (default `http://localhost:9000`) |
+
+### Scripts
+
+Run these inside `server/`:
+
+| Command              | Description                                   |
+| :------------------- | :-------------------------------------------- |
+| `npm start`          | Start the API                                 |
+| `npm run dev`        | Start the API and restart on file changes     |
+| `npm run db:migrate` | Apply any new migrations                      |
+| `npm run db:seed`    | Replace all data with the sample data         |
+| `npm run db:reset`   | Drop everything, migrate and seed             |
+
+## API Reference
+
+Endpoints marked 🔒 need an `Authorization: Bearer <token>` header, which the frontend sends automatically after login.
+
+| Method  | Endpoint                      | Description                              |
+| :------ | :---------------------------- | :--------------------------------------- |
+| `POST`  | `/signup/user`                | Create an account (`email`, `pnum`, `password`) |
+| `POST`  | `/login`                      | Log in and receive a token (`email`, `password`) |
+| `GET`   | `/data`                       | Latest products for the home page        |
+| `GET`   | `/home/bestseller`            | Bestselling products                     |
+| `GET`   | `/browseproducts/men`         | Men's clothing                           |
+| `GET`   | `/browseproducts/women`       | Women's products                         |
+| `GET`   | `/browseproducts/access`      | Accessories                              |
+| `GET`   | `/browseproducts/newarrivals` | All new arrivals                         |
+| `GET`   | `/profile` 🔒                 | Logged-in user's profile                 |
+| `GET`   | `/cartdata` 🔒                | Items in the user's cart                 |
+| `POST`  | `/addtocart` 🔒               | Add a product to the cart (`pid`, `count`) |
+| `PATCH` | `/buyitem` 🔒                 | Check out cart items (`pid` array)        |
+
+Errors are returned as JSON in the form `{ "error": "message" }` with a matching status code (`400`, `401`, `404`, `409`, `429` or `500`).
 
 ## Screenshots
 
-### Home Page
-![alt text](https://github.com/thakaresahil/poscon/blob/main/demo/Home.png?raw=true)
-
-
 ### Product Browse
-![alt text](https://github.com/thakaresahil/poscon/blob/main/demo/ProductBrowse.png?raw=true)
-
+![Product browse](demo/ProductBrowse.png)
 
 ### Product Details
-![alt text](https://github.com/thakaresahil/poscon/blob/main/demo/ItemDetails.png?raw=true)
-
+![Product details](demo/ItemDetails.png)
 
 ### Checkout
-![alt text](https://github.com/thakaresahil/poscon/blob/main/demo/CheckoutPage.png?raw=true)
+![Checkout](demo/CheckoutPage.png)
+
+## Roadmap
+
+- [ ] Cart quantity updates and item removal
+- [ ] Orders and order history
+- [ ] Simulated payment flow
+- [ ] Search, filters, sorting and pagination
+- [ ] Admin dashboard
+- [ ] Automated tests and CI
+- [ ] Docker setup and API docs
+- [ ] Live deployment
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
