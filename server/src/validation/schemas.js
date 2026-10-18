@@ -62,3 +62,30 @@ export const paymentSchema = z.discriminatedUnion("method", [
       ? { message: "Please choose a payment method" }
       : { message: ctx.defaultError },
 });
+
+export const PRODUCT_SORTS = ["newest", "popular", "price_asc", "price_desc", "discount"];
+
+const optionalPrice = z.coerce
+  .number({ invalid_type_error: "Price must be a number" })
+  .int()
+  .min(0, "Price cannot be negative")
+  .optional();
+
+export const productQuerySchema = z
+  .object({
+    q: z.string().trim().max(100).optional(),
+    gender: z.enum(["men", "women"], { message: "Gender must be men or women" }).optional(),
+    category: z.string().trim().toLowerCase().max(50).optional(),
+    minPrice: optionalPrice,
+    maxPrice: optionalPrice,
+    sort: z.enum(PRODUCT_SORTS, { message: "Invalid sort option" }).default("newest"),
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(48, "You can request up to 48 products per page").default(12),
+  })
+  .refine(
+    (query) =>
+      query.minPrice === undefined ||
+      query.maxPrice === undefined ||
+      query.minPrice <= query.maxPrice,
+    { message: "Minimum price cannot be more than maximum price" }
+  );

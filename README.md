@@ -10,7 +10,10 @@ Poscon is a full-stack e-commerce store for clothing and accessories. Shoppers c
 
 ## Features
 
-- Product catalogue for men, women, accessories and new arrivals, with a bestsellers section on the home page
+- Product catalogue for men, women and accessories, with new arrivals and bestsellers on the home page
+- Product search from the navbar, with filters for gender, category and price range
+- Sorting by newest, popularity (units sold), price and biggest discount, with pagination
+- Search, filters, sort and page are kept in the URL, so results can be shared, reloaded and navigated with the back button
 - Product pages with their own shareable URL (`/product/:id`), discount pricing and quantity selection
 - Account signup, login and logout with hashed passwords (bcrypt) and JWT authentication
 - Shared login state across the app, protected cart and profile pages, and automatic logout when a session expires
@@ -175,10 +178,8 @@ Endpoints marked 🔒 need an `Authorization: Bearer <token>` header, which the 
 | `POST`  | `/login`                      | Log in and receive a token (`email`, `password`) |
 | `GET`   | `/data`                       | Latest products for the home page        |
 | `GET`   | `/home/bestseller`            | Bestselling products                     |
-| `GET`   | `/browseproducts/men`         | Men's clothing                           |
-| `GET`   | `/browseproducts/women`       | Women's products                         |
-| `GET`   | `/browseproducts/access`      | Accessories                              |
-| `GET`   | `/browseproducts/newarrivals` | All new arrivals                         |
+| `GET`   | `/products`                   | Search and filter products (see below)   |
+| `GET`   | `/products/categories`        | Product categories with product counts   |
 | `GET`   | `/products/:id`               | A single product                         |
 | `GET`   | `/profile` 🔒                 | Logged-in user's profile                 |
 | `GET`   | `/cartdata` 🔒                | Items in the user's cart                 |
@@ -189,6 +190,25 @@ Endpoints marked 🔒 need an `Authorization: Bearer <token>` header, which the 
 | `GET`   | `/orders` 🔒                  | The user's orders, newest first           |
 | `GET`   | `/orders/:id` 🔒              | A single order with its items, shipping address and payment details |
 | `POST`  | `/orders/:id/pay` 🔒          | Pay for an order with `card`, `upi` or `cod` (simulated) |
+
+### Product search
+
+`GET /products` accepts these query parameters, all optional:
+
+| Parameter  | Description                                                          |
+| :--------- | :------------------------------------------------------------------- |
+| `q`        | Text to search for in the product name, description and category     |
+| `gender`   | `men` or `women`                                                      |
+| `category` | A category from `/products/categories`, e.g. `accessories`           |
+| `minPrice` | Lowest sale price in rupees                                          |
+| `maxPrice` | Highest sale price in rupees                                         |
+| `sort`     | `newest` (default), `popular`, `price_asc`, `price_desc` or `discount` |
+| `page`     | Page number, starting at 1                                           |
+| `limit`    | Products per page, 1 to 48 (default 12)                              |
+
+Example: `/products?q=shirt&gender=men&sort=price_asc&page=1`
+
+The response contains `products`, `total`, `page`, `limit` and `totalPages`. Text search uses a trigram index (`pg_trgm`) so it stays fast as the catalogue grows.
 
 Errors are returned as JSON in the form `{ "error": "message" }` with a matching status code (`400`, `401`, `402`, `404`, `409`, `429` or `500`).
 
@@ -222,7 +242,7 @@ Use any name, any future expiry date and any 3 digit CVV. A declined payment lea
 - [x] Cart quantity updates and item removal
 - [x] Orders and order history
 - [x] Simulated payment flow
-- [ ] Search, filters, sorting and pagination
+- [x] Search, filters, sorting and pagination
 - [ ] Admin dashboard
 - [ ] Automated tests and CI
 - [ ] Docker setup and API docs
