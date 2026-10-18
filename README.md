@@ -82,11 +82,13 @@ poscon/
 │   │   ├── middleware/    # Auth, validation, rate limiting, errors
 │   │   ├── validation/    # zod request schemas
 │   │   └── utils/
+│   ├── tests/             # Jest + Supertest API tests
 │   └── db/
 │       ├── migrations/    # SQL schema, applied in order
 │       ├── migrate.js     # Migration runner
 │       ├── seed.js        # Sample products and demo user
 │       └── products.js    # Seed product data
+├── e2e/                   # Playwright end-to-end tests
 └── demo/                  # Screenshots
 ```
 
@@ -161,6 +163,8 @@ The app opens at `http://localhost:3000`.
 | `PORT`           | Port the API listens on (default `9000`)            |
 | `CLIENT_ORIGIN`  | Frontend URL(s) allowed by CORS, comma separated    |
 | `SESSION_SECRET` | Secret used to sign JWTs                            |
+| `PG_TEST_DATABASE` | Database used by the test suites (default `poscon_test`, must end in `_test`) |
+| `AUTH_RATE_LIMIT` | Login and signup attempts allowed per 15 minutes (default `20`) |
 
 **postocom/.env**
 
@@ -179,6 +183,31 @@ Run these inside `server/`:
 | `npm run db:migrate` | Apply any new migrations                      |
 | `npm run db:seed`    | Replace all data with the sample data         |
 | `npm run db:reset`   | Drop everything, migrate and seed             |
+| `npm test`           | Run the API tests                             |
+| `npm run test:coverage` | Run the API tests with a coverage report   |
+
+## Testing
+
+| Suite | Tool | What it covers | Command |
+| :---- | :--- | :------------- | :------ |
+| API | Jest + Supertest | 85 tests: auth, products and search, cart, orders, payments, admin access, plus unit tests for the payment helpers | `cd server && npm test` |
+| Frontend | Jest + React Testing Library | Card helpers, formatting and the product card component | `cd postocom && npm test` |
+| End to end | Playwright | Full journeys in a real browser: sign up, search, cart, checkout, declined and successful payment, order history, admin adding a product and shipping an order, protected pages | `cd e2e && npm test` |
+
+The API suite reaches **about 97% line coverage** (`npm run test:coverage`).
+
+The API and end-to-end tests run against a separate PostgreSQL database (`poscon_test` by default), which is created and rebuilt from the migrations and seed data before each run, so they never touch development data. The test setup refuses to run against a database whose name does not end in `_test`.
+
+To run the end-to-end tests for the first time:
+
+```bash
+cd e2e
+npm install
+npx playwright install chromium
+npm test
+```
+
+Playwright starts the API on port 9100 and the frontend on port 3100 by itself, so it can run alongside a local dev setup.
 
 ## API Reference
 
@@ -269,7 +298,8 @@ Use any name, any future expiry date and any 3 digit CVV. A declined payment lea
 - [x] Simulated payment flow
 - [x] Search, filters, sorting and pagination
 - [x] Admin dashboard
-- [ ] Automated tests and CI
+- [x] Automated tests
+- [ ] CI pipeline
 - [ ] Docker setup and API docs
 - [ ] Live deployment
 

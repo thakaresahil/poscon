@@ -130,3 +130,7 @@ dist
 .pnp.*
 # React production build
 postocom/build
+
+# Playwright output
+e2e/test-results
+e2e/playwright-report

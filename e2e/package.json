@@ -1,0 +1,14 @@
+{
+  "name": "poscon-e2e",
+  "private": true,
+  "description": "End-to-end browser tests for Poscon",
+  "license": "MIT",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1"
+  }
+}
