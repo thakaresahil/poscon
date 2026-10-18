@@ -2,7 +2,7 @@ import db from "../config/db.js";
 
 export const getProfile = async (req, res) => {
   const udata = await db.query(
-    "SELECT id, name, email, pnum, address FROM users WHERE id = $1",
+    "SELECT id, name, email, pnum, address, is_admin FROM users WHERE id = $1",
     [req.user.id]
   );
   if (udata.rowCount === 0) {

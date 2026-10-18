@@ -4,7 +4,12 @@ Poscon is a full-stack e-commerce store for clothing and accessories. Shoppers c
 
 **Live demo:** _coming soon_
 
-**Demo account:** `demo@poscon.dev` / `demo1234` (created by the seed script)
+**Demo accounts** (created by the seed script):
+
+| Role     | Email              | Password    |
+| :------- | :----------------- | :---------- |
+| Customer | `demo@poscon.dev`  | `demo1234`  |
+| Admin    | `admin@poscon.dev` | `admin1234` |
 
 ![Home page](demo/Home.png)
 
@@ -25,6 +30,13 @@ Poscon is a full-stack e-commerce store for clothing and accessories. Shoppers c
 - Simulated payment step with card, UPI and cash on delivery, including declined payments and retries (see [Demo Payments](#demo-payments))
 - Profile page for the logged-in user
 - Custom 404 page for unknown URLs
+
+### Admin dashboard
+
+- Revenue, order, customer and product totals, a 30 day revenue chart, top selling products and recent orders
+- Add, edit and delete products with a live preview, and choose which products appear in Best Sellers
+- View all orders, filter by status and move orders through Placed → Shipped → Delivered, or cancel them
+- Admin pages are hidden from customers, and every admin API request checks the admin role in the database
 - Database migrations and seed data, so the whole app can be set up with one command
 
 ### Security
@@ -82,7 +94,7 @@ poscon/
 
 | Table        | Purpose                                                        |
 | :----------- | :------------------------------------------------------------- |
-| `users`      | Accounts with email, phone number and bcrypt password hash     |
+| `users`      | Accounts with email, phone number, bcrypt password hash and admin flag |
 | `products`   | Catalogue with price, sale price, gender, category, bestseller flag |
 | `cart`       | Items in a user's cart, one row per product                     |
 | `orders`     | Placed orders with status, total and shipping address           |
@@ -210,7 +222,20 @@ Example: `/products?q=shirt&gender=men&sort=price_asc&page=1`
 
 The response contains `products`, `total`, `page`, `limit` and `totalPages`. Text search uses a trigram index (`pg_trgm`) so it stays fast as the catalogue grows.
 
-Errors are returned as JSON in the form `{ "error": "message" }` with a matching status code (`400`, `401`, `402`, `404`, `409`, `429` or `500`).
+### Admin endpoints
+
+All admin endpoints need a token for a user with the admin role. Other users get `403`.
+
+| Method   | Endpoint                | Description                                        |
+| :------- | :---------------------- | :------------------------------------------------- |
+| `GET`    | `/admin/stats`          | Totals, daily revenue for 30 days, top products and recent orders |
+| `GET`    | `/admin/orders`         | All orders, optionally filtered by `status`, with `page` and `limit` |
+| `PATCH`  | `/admin/orders/:id`     | Change an order's `status` (only valid transitions are allowed) |
+| `POST`   | `/admin/products`       | Create a product                                   |
+| `PUT`    | `/admin/products/:id`   | Update a product                                   |
+| `DELETE` | `/admin/products/:id`   | Delete a product (past orders keep their copy)     |
+
+Errors are returned as JSON in the form `{ "error": "message" }` with a matching status code (`400`, `401`, `402`, `403`, `404`, `409`, `429` or `500`).
 
 ## Demo Payments
 
@@ -243,7 +268,7 @@ Use any name, any future expiry date and any 3 digit CVV. A declined payment lea
 - [x] Orders and order history
 - [x] Simulated payment flow
 - [x] Search, filters, sorting and pagination
-- [ ] Admin dashboard
+- [x] Admin dashboard
 - [ ] Automated tests and CI
 - [ ] Docker setup and API docs
 - [ ] Live deployment

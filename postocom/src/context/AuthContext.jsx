@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { AUTH_LOGOUT_EVENT } from "../api/client";
+import api, { AUTH_LOGOUT_EVENT } from "../api/client";
 
 const AuthContext = createContext(null);
 
@@ -7,6 +7,23 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   // null, "login" or "register"
   const [authDialog, setAuthDialog] = useState(null);
+  // Only used to show admin pages; the API checks admin access on every request
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [checkingRole, setCheckingRole] = useState(Boolean(token));
+
+  useEffect(() => {
+    if (!token) {
+      setIsAdmin(false);
+      setCheckingRole(false);
+      return;
+    }
+    setCheckingRole(true);
+    api
+      .get("/profile")
+      .then((response) => setIsAdmin(Boolean(response.data.is_admin)))
+      .catch(() => setIsAdmin(false))
+      .finally(() => setCheckingRole(false));
+  }, [token]);
 
   const login = useCallback((newToken, uid) => {
     localStorage.setItem("token", newToken);
@@ -33,6 +50,8 @@ export function AuthProvider({ children }) {
   const value = {
     token,
     isLoggedIn: Boolean(token),
+    isAdmin,
+    checkingRole,
     login,
     logout,
     authDialog,

@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import db from "../config/db.js";
 import { config } from "../config/env.js";
 
 export const generateToken = (user) => {
@@ -26,4 +27,17 @@ export const authenticateToken = (req, res, next) => {
 
   req.user = verifiedUser;
   next();
+};
+
+// Checked against the database on every request so removing admin access takes effect immediately
+export const requireAdmin = async (req, res, next) => {
+  try {
+    const result = await db.query("SELECT is_admin FROM users WHERE id = $1", [req.user.id]);
+    if (!result.rows[0]?.is_admin) {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
 };

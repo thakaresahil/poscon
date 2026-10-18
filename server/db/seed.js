@@ -10,6 +10,13 @@ const demoUser = {
   address: "221B Baker Street, Mumbai",
 };
 
+const adminUser = {
+  name: "Store Admin",
+  email: "admin@poscon.dev",
+  pnum: "9000000000",
+  password: "admin1234",
+};
+
 async function seed() {
   const db = createClient();
   await db.connect();
@@ -43,9 +50,16 @@ async function seed() {
       [demoUser.name, demoUser.email, demoUser.pnum, passhash, demoUser.address]
     );
 
+    const adminPasshash = await bcrypt.hash(adminUser.password, 10);
+    await db.query(
+      "INSERT INTO users (name, email, pnum, passhash, is_admin) VALUES ($1, $2, $3, $4, TRUE)",
+      [adminUser.name, adminUser.email, adminUser.pnum, adminPasshash]
+    );
+
     await db.query("COMMIT");
-    console.log(`Seeded ${products.length} products and 1 demo user`);
+    console.log(`Seeded ${products.length} products, 1 demo user and 1 admin`);
     console.log(`Demo login: ${demoUser.email} / ${demoUser.password}`);
+    console.log(`Admin login: ${adminUser.email} / ${adminUser.password}`);
   } catch (error) {
     await db.query("ROLLBACK");
     throw error;

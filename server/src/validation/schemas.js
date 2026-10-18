@@ -89,3 +89,34 @@ export const productQuerySchema = z
       query.minPrice <= query.maxPrice,
     { message: "Minimum price cannot be more than maximum price" }
   );
+
+export const productSchema = z
+  .object({
+    namee: z.string().trim().min(2, "Product name is required").max(255),
+    description: z.string().trim().max(2000).default(""),
+    img: z.string().trim().url("Image must be a valid URL").max(2000),
+    price: z.coerce.number().int("Price must be a whole number").min(1, "Price must be at least ₹1"),
+    sellprice: z.coerce.number().int("Sale price must be a whole number").min(1, "Sale price must be at least ₹1"),
+    gender: z.enum(["men", "women"], { message: "Gender must be men or women" }),
+    category: z
+      .string()
+      .trim()
+      .toLowerCase()
+      .regex(/^[a-z0-9-]{2,50}$/, "Category can only use letters, numbers and dashes"),
+    is_bestseller: z.boolean().default(false),
+  })
+  .refine((product) => product.sellprice <= product.price, {
+    message: "Sale price cannot be more than the original price",
+  });
+
+export const ORDER_STATUSES = ["placed", "shipped", "delivered", "cancelled"];
+
+export const orderStatusSchema = z.object({
+  status: z.enum(ORDER_STATUSES, { message: "Invalid order status" }),
+});
+
+export const adminOrderQuerySchema = z.object({
+  status: z.enum(ORDER_STATUSES, { message: "Invalid order status" }).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+});
