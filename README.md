@@ -16,7 +16,9 @@ Poscon is a full-stack e-commerce store for clothing and accessories. Shoppers c
 - Shared login state across the app, protected cart and profile pages, and automatic logout when a session expires
 - Cart with quantity controls, item removal, live subtotal and a navbar item count badge
 - Adding a product that is already in the cart increases its quantity instead of duplicating it
-- Checkout tied to the logged-in user
+- Checkout with a shipping address form, prefilled from the user's profile
+- Orders are created in a single database transaction that locks the cart, so a double click cannot place the same order twice
+- Order history and order detail pages, with the price paid saved on each order item
 - Profile page for the logged-in user
 - Custom 404 page for unknown URLs
 - Database migrations and seed data, so the whole app can be set up with one command
@@ -77,7 +79,9 @@ poscon/
 | :----------- | :------------------------------------------------------------- |
 | `users`      | Accounts with email, phone number and bcrypt password hash     |
 | `products`   | Catalogue with price, sale price, gender, category, bestseller flag |
-| `cart`       | Items a user has added (`status` 0 = in cart, 1 = purchased), one row per product in the active cart |
+| `cart`       | Items in a user's cart, one row per product                     |
+| `orders`     | Placed orders with status, total and shipping address           |
+| `order_items`| Products in each order, with the name, image and price at purchase time |
 | `bestseller` | View over `products` where the bestseller flag is set          |
 
 ## Getting Started
@@ -178,7 +182,9 @@ Endpoints marked 🔒 need an `Authorization: Bearer <token>` header, which the 
 | `POST`  | `/addtocart` 🔒               | Add a product to the cart, or increase its quantity (`pid`, `count`) |
 | `PATCH` | `/cart/:id` 🔒                | Change the quantity of a cart item (`quantity`, 1 to 10) |
 | `DELETE`| `/cart/:id` 🔒                | Remove an item from the cart             |
-| `PATCH` | `/buyitem` 🔒                 | Check out cart items (`pid` array)        |
+| `POST`  | `/orders` 🔒                  | Place an order from the cart (`name`, `phone`, `address`, `city`, `pincode`) |
+| `GET`   | `/orders` 🔒                  | The user's orders, newest first           |
+| `GET`   | `/orders/:id` 🔒              | A single order with its items and shipping address |
 
 Errors are returned as JSON in the form `{ "error": "message" }` with a matching status code (`400`, `401`, `404`, `409`, `429` or `500`).
 
@@ -196,7 +202,7 @@ Errors are returned as JSON in the form `{ "error": "message" }` with a matching
 ## Roadmap
 
 - [x] Cart quantity updates and item removal
-- [ ] Orders and order history
+- [x] Orders and order history
 - [ ] Simulated payment flow
 - [ ] Search, filters, sorting and pagination
 - [ ] Admin dashboard

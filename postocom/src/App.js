@@ -13,6 +13,9 @@ import About from "./component/about/About";
 import Contact from "./component/contact/Contact";
 import Carthole from "./component/Carthold/Carthole";
 import NotFound from "./component/notfound/NotFound";
+import Checkout from "./component/checkout/Checkout";
+import Orders from "./component/orders/Orders";
+import OrderDetail from "./component/orders/OrderDetail";
 
 const commonLayout = (component) => (
   <>
@@ -56,6 +59,30 @@ const router = createBrowserRouter([
     element: commonLayout(
       <ProtectedRoute>
         <Carthole />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/checkout",
+    element: commonLayout(
+      <ProtectedRoute>
+        <Checkout />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/orders",
+    element: commonLayout(
+      <ProtectedRoute>
+        <Orders />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/orders/:id",
+    element: commonLayout(
+      <ProtectedRoute>
+        <OrderDetail />
       </ProtectedRoute>
     ),
   },
