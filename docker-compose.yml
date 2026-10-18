@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: poscon
+      POSTGRES_PASSWORD: poscon
+      POSTGRES_DB: poscon
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U poscon -d poscon"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: ./server
+    environment:
+      PG_USER: poscon
+      PG_PASSWORD: poscon
+      PG_DATABASE: poscon
+      PG_HOST: db
+      PG_PORT: 5432
+      PORT: 9000
+      CLIENT_ORIGIN: http://localhost:3000
+      SESSION_SECRET: ${SESSION_SECRET:-change-me-in-production}
+    ports:
+      - "9000:9000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./postocom
+      args:
+        REACT_APP_API_URL: http://localhost:9000
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+
+volumes:
+  db-data:

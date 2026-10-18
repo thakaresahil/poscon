@@ -17,10 +17,21 @@ const adminUser = {
   password: "admin1234",
 };
 
+// With --if-empty the seed only runs on a database with no products, so it is
+// safe to run every time a container starts
+const onlyIfEmpty = process.argv.includes("--if-empty");
+
 async function seed() {
   const db = createClient();
   await db.connect();
   try {
+    if (onlyIfEmpty) {
+      const existing = await db.query("SELECT COUNT(*)::int AS count FROM products");
+      if (existing.rows[0].count > 0) {
+        console.log("Database already has data, skipping seed");
+        return;
+      }
+    }
     await db.query("BEGIN");
     await db.query("TRUNCATE payments, order_items, orders, cart, products, users RESTART IDENTITY CASCADE");
 

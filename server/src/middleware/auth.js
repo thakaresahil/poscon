@@ -9,7 +9,7 @@ export const generateToken = (user) => {
 const verifyToken = (token) => {
   try {
     return jwt.verify(token, config.sessionSecret);
-  } catch (err) {
+  } catch {
     return null;
   }
 };

@@ -12,7 +12,9 @@
     "db:reset": "node db/reset.js && node db/migrate.js && node db/seed.js",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
     "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand --coverage",
-    "db:reset:test": "node tests/resetTestDb.js"
+    "db:reset:test": "node tests/resetTestDb.js",
+    "lint": "eslint .",
+    "db:setup": "node db/migrate.js && node db/seed.js --if-empty"
   },
   "author": "",
   "license": "MIT",
@@ -28,6 +30,9 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "globals": "^15.15.0",
     "jest": "^29.7.0",
     "nodemon": "^3.1.14",
     "supertest": "^7.3.1"
