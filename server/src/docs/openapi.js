@@ -255,11 +255,13 @@ const openapi = {
       post: {
         tags: ["Cart"],
         summary: "Add a product to the cart",
-        description: "Adding a product that is already in the cart increases its quantity, up to 10.",
+        description:
+          "Adding a product that is already in the cart in the same size increases its quantity, up to 10. " +
+          "Products with sizes need a `size` from their `sizes` list.",
         security: loggedIn,
         requestBody: {
           required: true,
-          content: { "application/json": { schema: ref("AddToCartRequest"), example: { pid: 3, count: 2 } } },
+          content: { "application/json": { schema: ref("AddToCartRequest"), example: { pid: 3, count: 2, size: "M" } } },
         },
         responses: {
           201: json(
@@ -273,6 +275,7 @@ const openapi = {
                     id: { type: "integer" },
                     product_id: { type: "integer" },
                     quantity: { type: "integer" },
+                    size: { type: "string" },
                   },
                 },
               },
@@ -307,7 +310,12 @@ const openapi = {
         responses: {
           200: json({
             type: "object",
-            properties: { id: { type: "integer" }, product_id: { type: "integer" }, quantity: { type: "integer" } },
+            properties: {
+              id: { type: "integer" },
+              product_id: { type: "integer" },
+              quantity: { type: "integer" },
+              size: { type: "string" },
+            },
           }),
           400: responses.BadRequest,
           401: responses.Unauthorized,
@@ -702,6 +710,7 @@ const openapi = {
           gender: { type: "string", enum: ["men", "women"] },
           category: { type: "string", example: "shirts" },
           is_bestseller: { type: "boolean" },
+          sizes: { type: "array", items: { type: "string" }, description: "Empty when the product comes in one size", example: ["S", "M", "L"] },
           created_at: { type: "string", format: "date-time" },
         },
       },
@@ -740,6 +749,7 @@ const openapi = {
           gender: { type: "string", enum: ["men", "women"] },
           category: { type: "string", pattern: "^[a-z0-9-]{2,50}$" },
           is_bestseller: { type: "boolean", default: false },
+          sizes: { type: "array", items: { type: "string", maxLength: 10 }, maxItems: 12, default: [] },
         },
         example: {
           namee: "Festive Silk Saree",
@@ -750,6 +760,7 @@ const openapi = {
           gender: "women",
           category: "sarees",
           is_bestseller: false,
+          sizes: [],
         },
       },
       AddToCartRequest: {
@@ -758,6 +769,7 @@ const openapi = {
         properties: {
           pid: { type: "integer", description: "Product id" },
           count: { type: "integer", minimum: 1, maximum: 10 },
+          size: { type: "string", description: "Required when the product has sizes; one of its `sizes`" },
         },
       },
       CartItem: {
@@ -766,6 +778,7 @@ const openapi = {
           id: { type: "integer", description: "Cart item id" },
           product_id: { type: "integer" },
           quantity: { type: "integer" },
+          size: { type: "string", description: "Empty when the product has no sizes" },
           namee: { type: "string" },
           description: { type: "string" },
           img: { type: "string" },
@@ -827,6 +840,7 @@ const openapi = {
                 img: { type: "string" },
                 price: { type: "integer", description: "Price paid per item" },
                 quantity: { type: "integer" },
+                size: { type: "string" },
               },
             },
           },

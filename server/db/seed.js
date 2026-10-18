@@ -2,6 +2,14 @@ import bcrypt from "bcrypt";
 import { createClient } from "./client.js";
 import products from "./products.js";
 
+const LETTER_SIZES = ["XS", "S", "M", "L", "XL"];
+const WAIST_SIZES = ["28", "30", "32", "34", "36"];
+const sizesFor = (category) => {
+  if (["jeans", "trousers"].includes(category)) return WAIST_SIZES;
+  if (category === "accessories") return [];
+  return LETTER_SIZES;
+};
+
 const demoUser = {
   name: "Demo User",
   email: "demo@poscon.dev",
@@ -42,8 +50,8 @@ async function seed() {
       // Spread arrival dates so the newest products come last in the list
       const daysAgo = products.length - index;
       await db.query(
-        `INSERT INTO products (namee, description, img, price, sellprice, gender, category, is_bestseller, created_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW() - $9 * INTERVAL '1 day')`,
+        `INSERT INTO products (namee, description, img, price, sellprice, gender, category, is_bestseller, created_at, sizes)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW() - $9 * INTERVAL '1 day', $10)`,
         [
           product.namee,
           product.description,
@@ -54,6 +62,7 @@ async function seed() {
           product.category,
           product.bestseller || false,
           daysAgo,
+          sizesFor(product.category),
         ]
       );
     }

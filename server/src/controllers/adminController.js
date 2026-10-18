@@ -67,7 +67,12 @@ export const getAllOrders = async (req, res) => {
     db.query(
       `SELECT orders.id, orders.status, orders.payment_status, orders.payment_method, orders.total,
               orders.created_at, orders.ship_name, orders.ship_city, users.email,
-              STRING_AGG(order_items.product_name || ' x' || order_items.quantity, ', ' ORDER BY order_items.id) AS items
+              STRING_AGG(
+                order_items.product_name
+                  || CASE WHEN order_items.size <> '' THEN ' (' || order_items.size || ')' ELSE '' END
+                  || ' x' || order_items.quantity,
+                ', ' ORDER BY order_items.id
+              ) AS items
        FROM orders
        JOIN users ON users.id = orders.user_id
        LEFT JOIN order_items ON order_items.order_id = orders.id
@@ -116,6 +121,7 @@ export const updateOrderStatus = async (req, res) => {
 };
 
 const productColumns = [
+  "sizes",
   "namee",
   "description",
   "img",

@@ -9,7 +9,7 @@ export const placeOrder = async (req, res) => {
     const order = await withTransaction(async (client) => {
       // Lock the cart rows so a double click cannot order the same items twice
       const cart = await client.query(
-        `SELECT cart.product_id, cart.quantity, products.namee, products.img, products.sellprice
+        `SELECT cart.product_id, cart.quantity, cart.size, products.namee, products.img, products.sellprice
          FROM cart JOIN products ON products.id = cart.product_id
          WHERE cart.user_id = $1
          ORDER BY cart.created_at
@@ -34,9 +34,9 @@ export const placeOrder = async (req, res) => {
 
       for (const item of cart.rows) {
         await client.query(
-          `INSERT INTO order_items (order_id, product_id, product_name, img, price, quantity)
-           VALUES ($1, $2, $3, $4, $5, $6)`,
-          [orderId, item.product_id, item.namee, item.img, item.sellprice, item.quantity]
+          `INSERT INTO order_items (order_id, product_id, product_name, img, price, quantity, size)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          [orderId, item.product_id, item.namee, item.img, item.sellprice, item.quantity, item.size]
         );
       }
       await client.query("DELETE FROM cart WHERE user_id = $1", [req.user.id]);
@@ -77,7 +77,7 @@ export const getOrderById = async (req, res) => {
     return res.status(404).json({ error: "Order not found" });
   }
   const items = await db.query(
-    `SELECT id, product_id, product_name, img, price, quantity
+    `SELECT id, product_id, product_name, img, price, quantity, size
      FROM order_items WHERE order_id = $1 ORDER BY id`,
     [req.params.id]
   );

@@ -88,7 +88,7 @@ describe("responses match the documented fields", () => {
 
   test("GET /cartdata and GET /orders/{id}", async () => {
     const customer = await createCustomer();
-    await api().post("/addtocart").set(auth(customer.token)).send({ pid: 3, count: 1 });
+    await api().post("/addtocart").set(auth(customer.token)).send({ pid: 3, count: 1, size: "M" });
     const cart = await api().get("/cartdata").set(auth(customer.token)).expect(200);
     expect(Object.keys(cart.body[0]).sort()).toEqual(documentedKeys(openapi.components.schemas.CartItem));
 

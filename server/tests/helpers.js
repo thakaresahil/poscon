@@ -42,7 +42,7 @@ export const testCard = (number = "4242424242424242") => ({
 });
 
 // Adds products to the customer's cart and places an order, returning the order
-export const placeOrder = async (token, items = [{ pid: 1, count: 1 }]) => {
+export const placeOrder = async (token, items = [{ pid: 1, count: 1, size: "M" }]) => {
   for (const item of items) {
     await api().post("/addtocart").set(auth(token)).send(item).expect(201);
   }

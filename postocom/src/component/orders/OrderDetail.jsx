@@ -104,7 +104,7 @@ function OrderDetail() {
                 <p>{item.product_name}</p>
               )}
               <p className="text-gray-500 text-sm">
-                ₹{item.price} x {item.quantity}
+                {item.size ? `Size ${item.size} · ` : ""}₹{item.price} x {item.quantity}
               </p>
             </div>
             <p className="font-semibold">₹{item.price * item.quantity}</p>

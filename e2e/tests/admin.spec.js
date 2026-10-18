@@ -6,7 +6,7 @@ test("an admin adds a product and ships a customer's order", async ({ page, requ
   const login = await request.post(`${API_URL}/login`, { data: demoCustomer });
   const { token } = await login.json();
   const headers = { Authorization: `Bearer ${token}` };
-  await request.post(`${API_URL}/addtocart`, { headers, data: { pid: 2, count: 1 } });
+  await request.post(`${API_URL}/addtocart`, { headers, data: { pid: 2, count: 1, size: "M" } });
   const orderResponse = await request.post(`${API_URL}/orders`, {
     headers,
     data: { name: "Demo User", phone: "9999999999", address: "221B Baker Street", city: "Mumbai", pincode: "400001" },

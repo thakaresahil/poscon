@@ -17,6 +17,7 @@ export const loginSchema = z.object({
 export const addToCartSchema = z.object({
   pid: z.coerce.number().int().positive(),
   count: z.coerce.number().int().min(1, quantityMessage).max(10, quantityMessage),
+  size: z.string().trim().toUpperCase().max(10).default(""),
 });
 
 export const updateCartSchema = z.object({
@@ -111,6 +112,11 @@ export const productSchema = z
       .toLowerCase()
       .regex(/^[a-z0-9-]{2,50}$/, "Category can only use letters, numbers and dashes"),
     is_bestseller: z.boolean().default(false),
+    sizes: z
+      .array(z.string().trim().toUpperCase().min(1).max(10, "Sizes can be up to 10 characters"))
+      .max(12, "A product can have up to 12 sizes")
+      .default([])
+      .transform((sizes) => [...new Set(sizes)]),
   })
   .refine((product) => product.sellprice <= product.price, {
     message: "Sale price cannot be more than the original price",

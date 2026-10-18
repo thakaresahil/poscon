@@ -20,13 +20,19 @@ export async function logIn(page, { email, password }) {
   await expect(page.getByRole("button", { name: "Log Out" })).toBeVisible();
 }
 
-export async function addToCart(page, productId, quantity = 1) {
+// Adds a product from its page, choosing a size when it has sizes, then opens the cart
+export async function addToCart(page, productId, { quantity = 1, size = "M" } = {}) {
   await page.goto(`/product/${productId}`);
-  for (let i = 1; i < quantity; i++) {
-    await page.getByRole("button", { name: "+" }).click();
+  const sizeButton = page.getByRole("button", { name: size, exact: true });
+  if (await sizeButton.count()) {
+    await sizeButton.click();
   }
-  await page.getByRole("button", { name: "ADD TO CART" }).click();
-  await expect(page).toHaveURL(/\/cart$/);
+  for (let i = 1; i < quantity; i++) {
+    await page.getByRole("button", { name: "Increase quantity" }).click();
+  }
+  await page.getByRole("button", { name: "Add to Cart" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "to your cart" })).toBeVisible();
+  await page.goto("/cart");
 }
 
 export async function fillShipping(page) {

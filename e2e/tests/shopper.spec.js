@@ -7,7 +7,7 @@ test("a new shopper signs up, buys two items and sees the order", async ({ page 
   await test.step("sign up and log in", async () => {
     await page.goto("/");
     await page.getByRole("button", { name: "Log In" }).first().click();
-    await page.getByRole("button", { name: "here." }).click();
+    await page.getByRole("button", { name: "Create an account" }).click();
     const dialog = page.getByRole("dialog");
     await dialog.getByPlaceholder("Email").fill(shopper.email);
     await dialog.getByPlaceholder("Phone Number").fill(shopper.pnum);
@@ -27,12 +27,18 @@ test("a new shopper signs up, buys two items and sees the order", async ({ page 
     await page.getByRole("searchbox", { name: "Search products" }).press("Enter");
     await expect(page.getByRole("heading", { name: 'Results for "linen"' })).toBeVisible();
     await page.getByRole("link", { name: /Linen Blend Casual Shirt/ }).click();
-    await page.getByRole("button", { name: "ADD TO CART" }).click();
+    await page.getByRole("button", { name: "Add to Cart" }).click();
+    await expect(page.getByText("Please choose a size.")).toBeVisible();
+    await page.getByRole("button", { name: "L", exact: true }).click();
+    await page.getByRole("button", { name: "Add to Cart" }).click();
+    await page.getByRole("status").getByRole("link", { name: "View cart" }).click();
     await expect(page).toHaveURL(/\/cart$/);
+    await expect(page.getByText("Size L")).toBeVisible();
 
     await addToCart(page, 5);
     await page.getByRole("button", { name: /Increase quantity of Linen/ }).click();
-    await expect(page.getByText("Sub Total (3 items): ₹2997")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Your Cart (3 items)" })).toBeVisible();
+    await expect(page.getByRole("complementary").getByText("₹2997").last()).toBeVisible();
     await expect(page.getByLabel("3 items in cart").first()).toBeVisible();
   });
 
@@ -67,7 +73,7 @@ test("filters, sorting and pages are kept in the URL", async ({ page }) => {
   await expect(page).toHaveURL(/gender=women/);
   await expect(page).toHaveURL(/sort=price_asc/);
 
-  const prices = await page.locator("a[href^='/product/'] .font-semibold").allInnerTexts();
+  const prices = await page.locator("a[href^='/product/'] .price").allInnerTexts();
   const values = prices.map((text) => Number(text.replace(/\D/g, "")));
   expect(values).toEqual([...values].sort((a, b) => a - b));
 

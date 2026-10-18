@@ -16,6 +16,7 @@ const emptyProduct = {
   gender: "women",
   category: "",
   is_bestseller: false,
+  sizes: "",
 };
 
 function ProductForm() {
@@ -33,8 +34,8 @@ function ProductForm() {
     api
       .get(`/products/${id}`)
       .then((response) => {
-        const { namee, description, img, price, sellprice, gender, category, is_bestseller } = response.data;
-        setProduct({ namee, description, img, price, sellprice, gender, category, is_bestseller });
+        const { namee, description, img, price, sellprice, gender, category, is_bestseller, sizes } = response.data;
+        setProduct({ namee, description, img, price, sellprice, gender, category, is_bestseller, sizes: (sizes || []).join(", ") });
       })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
@@ -49,7 +50,12 @@ function ProductForm() {
     event.preventDefault();
     setFormError("");
     setSaving(true);
-    const body = { ...product, price: Number(product.price), sellprice: Number(product.sellprice) };
+    const body = {
+      ...product,
+      price: Number(product.price),
+      sellprice: Number(product.sellprice),
+      sizes: product.sizes.split(",").map((size) => size.trim()).filter(Boolean),
+    };
     try {
       if (isEdit) {
         await api.put(`/admin/products/${id}`, body);
@@ -119,6 +125,10 @@ function ProductForm() {
               <input className={inputClass} name="category" placeholder="e.g. shirts" value={product.category} onChange={handlechange} />
             </label>
           </div>
+          <label className="flex flex-col gap-1">
+            Sizes
+            <input className={inputClass} name="sizes" placeholder="e.g. S, M, L, XL (leave empty for one size)" value={product.sizes} onChange={handlechange} />
+          </label>
           <label className="flex items-center gap-2">
             <input type="checkbox" name="is_bestseller" checked={product.is_bestseller} onChange={handlechange} />
             Show in Best Sellers

@@ -16,6 +16,7 @@ const newProduct = {
   gender: "men",
   category: "Kurtas",
   is_bestseller: true,
+  sizes: ["s", "M", "L", "M"],
 };
 
 describe("admin access", () => {
@@ -37,9 +38,9 @@ describe("dashboard stats", () => {
     const before = (await api().get("/admin/stats").set(auth(admin))).body;
 
     const customer = await createCustomer();
-    const paid = await placeOrder(customer.token, [{ pid: 3, count: 1 }]);
+    const paid = await placeOrder(customer.token, [{ pid: 3, count: 1, size: "M" }]);
     await api().post(`/orders/${paid.id}/pay`).set(auth(customer.token)).send(testCard());
-    await placeOrder(customer.token, [{ pid: 5, count: 1 }]);
+    await placeOrder(customer.token, [{ pid: 5, count: 1, size: "M" }]);
 
     const after = (await api().get("/admin/stats").set(auth(admin))).body;
     expect(after.revenue - before.revenue).toBe(1299);
@@ -82,7 +83,7 @@ describe("managing orders", () => {
 describe("managing products", () => {
   test("creates, updates and deletes a product", async () => {
     const created = await api().post("/admin/products").set(auth(admin)).send(newProduct).expect(201);
-    expect(created.body).toMatchObject({ namee: "Test Linen Kurta", category: "kurtas" });
+    expect(created.body).toMatchObject({ namee: "Test Linen Kurta", category: "kurtas", sizes: ["S", "M", "L"] });
 
     await api()
       .put(`/admin/products/${created.body.id}`)
@@ -113,7 +114,7 @@ describe("managing products", () => {
   test("deleting a product keeps past orders intact", async () => {
     const product = (await api().post("/admin/products").set(auth(admin)).send(newProduct)).body;
     const customer = await createCustomer();
-    const order = await placeOrder(customer.token, [{ pid: product.id, count: 1 }]);
+    const order = await placeOrder(customer.token, [{ pid: product.id, count: 1, size: "M" }]);
 
     await api().delete(`/admin/products/${product.id}`).set(auth(admin)).expect(204);
 

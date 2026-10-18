@@ -40,11 +40,11 @@ describe("paying for orders", () => {
 
   test("supports UPI and cash on delivery", async () => {
     const customer = await createCustomer();
-    const upiOrder = await placeOrder(customer.token, [{ pid: 2, count: 1 }]);
+    const upiOrder = await placeOrder(customer.token, [{ pid: 2, count: 1, size: "M" }]);
     await pay(customer.token, upiOrder.id, { method: "upi", upiId: "fail@upi" }).expect(402);
     await pay(customer.token, upiOrder.id, { method: "upi", upiId: "test@okaxis" }).expect(200);
 
-    const codOrder = await placeOrder(customer.token, [{ pid: 6, count: 1 }]);
+    const codOrder = await placeOrder(customer.token, [{ pid: 6, count: 1, size: "M" }]);
     const cod = await pay(customer.token, codOrder.id, { method: "cod" }).expect(200);
     expect(cod.body.payment_status).toBe("cod");
   });

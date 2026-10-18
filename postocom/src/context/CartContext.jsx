@@ -36,8 +36,8 @@ export function CartProvider({ children }) {
     refreshCart();
   }, [refreshCart]);
 
-  const addItem = async (pid, count) => {
-    await api.post("/addtocart", { pid, count });
+  const addItem = async (pid, count, size = "") => {
+    await api.post("/addtocart", { pid, count, size });
     await refreshCart();
   };
 

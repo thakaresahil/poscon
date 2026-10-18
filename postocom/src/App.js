@@ -5,6 +5,7 @@ import Navbar from "./component/navbar/Navbar";
 import { createBrowserRouter, RouterProvider, ScrollRestoration } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
+import { ToastProvider } from "./context/ToastContext";
 import ProtectedRoute from "./component/routing/ProtectedRoute";
 import Productbrowse from "./component/product/Productbrowse";
 import ProductPage from "./component/product/ProductPage";
@@ -28,13 +29,14 @@ import ProductForm from "./component/admin/ProductForm";
 import AdminOrders from "./component/admin/AdminOrders";
 import AdminMessages from "./component/admin/AdminMessages";
 
+// The toast area lives inside the router so its links work
 const commonLayout = (component) => (
-  <>
+  <ToastProvider>
     <ScrollRestoration />
     <Navbar />
     <main>{component}</main>
     <Footer />
-  </>
+  </ToastProvider>
 );
 
 const router = createBrowserRouter([
