@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../../api/client";
 import React, { useEffect, useState } from "react";
 import Carttemplate from "./Carttemplate";
 import Loading from "../loading/Loading";
@@ -14,14 +14,8 @@ function Carthole() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await axios
-          .get("http://localhost:9000/cartdata", {
-            headers: { Authorization: `Bearer ${token}` },
-          })
-          .then((response) => {
-            setCartItemData(response.data);
-            // console.log(response.data);
-          });
+        const response = await api.get("/cartdata");
+        setCartItemData(response.data);
       } catch (error) {
         console.error("Error fetching data", error);
       } finally {
@@ -54,21 +48,7 @@ function Carthole() {
         pid: pid,
       };
       try {
-        await axios
-          .patch("http://localhost:9000/buyitem", buydetails, {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          })
-          .then((response) => {
-            try {
-              const result = response.data;
-              console.log(result);
-            } catch (error) {
-              console.log("Error Parsing JSON:", error);
-            }
-          });
+        await api.patch("/buyitem", buydetails);
       } catch (error) {
         console.error("Error Checkouting the products", error);
       }
@@ -101,7 +81,7 @@ function Carthole() {
         <Loading />
       )}
       <div className="flex justify-between">
-        <p className="font-semibold text-3xl">Sub Total: {total}</p>
+        <p className="font-semibold text-3xl">Sub Total: ₹{total}</p>
         <button
           className="px-6 py-2 bg-red-500 text-white rounded-md transition-transform duration-300 hover:scale-105"
           onClick={handleChechout}

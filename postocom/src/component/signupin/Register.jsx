@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../../api/client";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog } from "@mui/material";
@@ -47,12 +47,8 @@ function Register({ open, handleClose, handleLoginComponent}) {
 
     if (signupdata.password === signupdata.confirm_password) {
       const { confirm_password, ...newUser } = signupdata;
-      axios
-        .post("http://localhost:9000/signup/user", newUser, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
+      api
+        .post("/signup/user", newUser)
         .then(() => {
           handleLoginComponent();
         })

@@ -1,10 +1,8 @@
-import axios from "axios";
+import api from "../../api/client";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Dialog } from "@mui/material";
 
 function Login({ open, handleClose, handleRegister }) {
-  const navigate = useNavigate();
   const localcheck = localStorage.getItem("token");
   useEffect(() => {
     if (localcheck) {
@@ -34,12 +32,8 @@ function Login({ open, handleClose, handleRegister }) {
         return;
       }
     }
-    axios
-      .post("http://localhost:9000/login", logindata, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
+    api
+      .post("/login", logindata)
       .then((response) => {
         try {
           const result = response.data;
@@ -51,13 +45,6 @@ function Login({ open, handleClose, handleRegister }) {
             localStorage.setItem("token", result.token);
             handleClose();
           }
-          // if (neednavigate === "signup") {
-          //   console.log(result);
-          //   setRedirecttosignup("Account Not Found, Please Signup!");
-          // } else {
-          //   console.log("LogIn successfull");
-          //   navigate(weretoNavigate);
-          // }
         } catch (error) {
           console.error("Error parsing JSON:", error);
         }
@@ -73,13 +60,11 @@ function Login({ open, handleClose, handleRegister }) {
     event.preventDefault();
     setRedirecttosignup("");
     setWrongPassword("");
-    // console.log(logindata);
     if (localStorage.getItem("token") !== null){
       handleClose();
     } else {
       loggerin();
     }
-    // axios.post("http://localhost:3000/signin", { data: logindata });
   }
 
   return (

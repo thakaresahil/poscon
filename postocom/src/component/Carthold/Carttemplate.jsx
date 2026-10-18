@@ -23,9 +23,9 @@ function Carttemplate({
           <p>
             At{" "}
             <span className="font-light text-gray-400 line-through ">
-              {price}
+              ₹{price}
             </span>{" "}
-            <span className="font-semibold ">{sellprice}</span>
+            <span className="font-semibold ">₹{sellprice}</span>
             <span className="text-red-400 ">({discPercents}%OFF)</span>
           </p>
         </div>

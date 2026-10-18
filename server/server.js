@@ -1,12 +1,8 @@
 import express from "express";
 import pg from "pg";
 import env from "dotenv";
-import path from "path";
 import cors from "cors";
 import bodyParser from "body-parser";
-import multer from "multer";
-import fs from "fs";
-import util from "util";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import helmet from "helmet";
@@ -16,7 +12,7 @@ import { z } from "zod";
 env.config();
 
 const app = express();
-const port = 9000;
+const port = process.env.PORT || 9000;
 const saltRounds = 10;
 const secretKey = process.env.SESSION_SECRET;
 
@@ -34,8 +30,6 @@ app.use(cors({ origin: allowedOrigins }));
 
 app.use(bodyParser.json({ limit: "10kb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use(express.static("public"));
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -85,29 +79,6 @@ const db = new pg.Client({
 });
 db.connect();
 
-const unlinkAsync = util.promisify(fs.unlink);
-
-const profstorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    return cb(null, "./public/profimg");
-  },
-  filename: function (req, file, cb) {
-    return cb(
-      null,
-      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
-    );
-  },
-});
-
-async function deleteFile(filePath) {
-  try {
-    await unlinkAsync(filePath);
-    console.log(`Successfully deleted ${filePath}`);
-  } catch (error) {
-    console.error(`Error deleting ${filePath}:`, error);
-  }
-}
-
 const generateToken = (user) => {
   return jwt.sign({ id: user.id }, secretKey, { expiresIn: "7d" });
 };
@@ -138,21 +109,20 @@ const authenticateToken = (req, res, next) => {
 app.get("/data", async (req, res) => {
   try {
     const dataretrive = await db.query("SELECT * FROM products LIMIT 8");
-    return res.json(dataretrive.rows).end();
-    // console.log(dataretrive);
+    return res.json(dataretrive.rows);
   } catch (err) {
     console.error(err);
-    return res.json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
 app.get("/home/bestseller", async (req, res) => {
   try {
     const bestseller = await db.query("SELECT * FROM bestseller");
-    return res.json(bestseller.rows).end();
+    return res.json(bestseller.rows);
   } catch (error) {
     console.error(error);
-    return res.json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
@@ -161,20 +131,20 @@ app.get("/browseproducts/women", async (req, res) => {
     const products = await db.query(
       "SELECT * FROM products WHERE gender = 'women' ORDER BY RANDOM() LIMIT 36"
     );
-    return res.json(products.rows).end();
+    return res.json(products.rows);
   } catch (error) {
     console.error(error);
-    return res.json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
 app.get("/browseproducts/newarrivals", async (req, res) => {
   try {
     const products = await db.query("SELECT * FROM products LIMIT 36");
-    return res.json(products.rows).end();
+    return res.json(products.rows);
   } catch (error) {
     console.error(error);
-    return res.json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
@@ -183,10 +153,10 @@ app.get("/browseproducts/men", async (req, res) => {
     const products = await db.query(
       "SELECT * FROM products WHERE gender = 'men' and category !='accessories' ORDER BY RANDOM() LIMIT 36"
     );
-    return res.json(products.rows).end();
+    return res.json(products.rows);
   } catch (error) {
     console.error(error);
-    return res.json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
@@ -195,10 +165,10 @@ app.get("/browseproducts/access", async (req, res) => {
     const products = await db.query(
       "SELECT * FROM products WHERE category = 'accessories' ORDER BY RANDOM() LIMIT 36"
     );
-    return res.json(products.rows).end();
+    return res.json(products.rows);
   } catch (error) {
     console.error(error);
-    return res.json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
@@ -315,10 +285,6 @@ app.post("/login", authLimiter, validate(loginSchema), async (req, res) => {
     console.error(error);
     return res.status(500).json({ error: "Internal server error" });
   }
-});
-
-app.get("/protected", authenticateToken, (req, res) => {
-  res.json({ message: "This is a protected route", user: req.user });
 });
 
 app.listen(port, () => {

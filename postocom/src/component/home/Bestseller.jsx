@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../api/client";
 import Loading from "../loading/Loading";
 import Cards from "../cards/Cards";
 import Detailedview from "../detailed/Detailedview";
@@ -20,7 +20,7 @@ function Bestseller() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:9000/home/bestseller");
+        const response = await api.get("/home/bestseller");
         setBsell(response.data);
       } catch (error) {
         console.error("Error fetching data", error);

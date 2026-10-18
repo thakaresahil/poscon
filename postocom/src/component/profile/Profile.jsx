@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from "../../api/client";
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 
@@ -15,9 +15,7 @@ function Profile() {
       const fetchData = async () => {
         try {
             setPdata("");
-            const response = await axios.get("http://localhost:9000/profile", {
-                headers: { Authorization: `Bearer ${localcheck}` },
-            });
+            const response = await api.get("/profile");
             setPdata(response.data);
         } catch (error) {
             console.log("Error Fetching Profile", error);
@@ -27,7 +25,7 @@ function Profile() {
         }
       }
       fetchData();
-    }, [localcheck])
+    }, [localcheck, navigate])
     
 
 
