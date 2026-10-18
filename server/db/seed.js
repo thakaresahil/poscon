@@ -15,7 +15,7 @@ async function seed() {
   await db.connect();
   try {
     await db.query("BEGIN");
-    await db.query("TRUNCATE order_items, orders, cart, products, users RESTART IDENTITY CASCADE");
+    await db.query("TRUNCATE payments, order_items, orders, cart, products, users RESTART IDENTITY CASCADE");
 
     for (const product of products) {
       await db.query(

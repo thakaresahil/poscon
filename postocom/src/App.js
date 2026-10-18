@@ -16,6 +16,7 @@ import NotFound from "./component/notfound/NotFound";
 import Checkout from "./component/checkout/Checkout";
 import Orders from "./component/orders/Orders";
 import OrderDetail from "./component/orders/OrderDetail";
+import Payment from "./component/payment/Payment";
 
 const commonLayout = (component) => (
   <>
@@ -83,6 +84,14 @@ const router = createBrowserRouter([
     element: commonLayout(
       <ProtectedRoute>
         <OrderDetail />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/orders/:id/pay",
+    element: commonLayout(
+      <ProtectedRoute>
+        <Payment />
       </ProtectedRoute>
     ),
   },

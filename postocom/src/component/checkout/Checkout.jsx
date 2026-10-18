@@ -56,7 +56,7 @@ function Checkout() {
     setPlacing(true);
     try {
       const order = await placeOrder(shipping);
-      navigate(`/orders/${order.id}`, { replace: true, state: { placed: true } });
+      navigate(`/orders/${order.id}/pay`, { replace: true });
     } catch (error) {
       setFormError(error.response?.data?.error || "Could not place your order, please try again.");
       setPlacing(false);
@@ -91,7 +91,7 @@ function Checkout() {
           disabled={placing}
           className="w-full text-center py-3 rounded bg-red-500 text-white hover:bg-red-600 focus:outline-none my-1 hover:shadow-lg font-medium transition transform hover:-translate-y-0.5 disabled:opacity-60"
         >
-          {placing ? "Placing Order..." : `Place Order (₹${total})`}
+          {placing ? "Placing Order..." : `Continue to Payment (₹${total})`}
         </button>
       </form>
 

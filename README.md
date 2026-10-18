@@ -19,6 +19,7 @@ Poscon is a full-stack e-commerce store for clothing and accessories. Shoppers c
 - Checkout with a shipping address form, prefilled from the user's profile
 - Orders are created in a single database transaction that locks the cart, so a double click cannot place the same order twice
 - Order history and order detail pages, with the price paid saved on each order item
+- Simulated payment step with card, UPI and cash on delivery, including declined payments and retries (see [Demo Payments](#demo-payments))
 - Profile page for the logged-in user
 - Custom 404 page for unknown URLs
 - Database migrations and seed data, so the whole app can be set up with one command
@@ -31,6 +32,7 @@ Poscon is a full-stack e-commerce store for clothing and accessories. Shoppers c
 - Login and signup are rate limited
 - Security headers with helmet, and CORS restricted to the frontend URL
 - Password hashes are never returned by the API
+- Only the card brand and last four digits are stored for payments, never the full card number or CVV
 
 ## Tech Stack
 
@@ -82,6 +84,7 @@ poscon/
 | `cart`       | Items in a user's cart, one row per product                     |
 | `orders`     | Placed orders with status, total and shipping address           |
 | `order_items`| Products in each order, with the name, image and price at purchase time |
+| `payments`   | Every payment attempt with its result, amount and transaction ID |
 | `bestseller` | View over `products` where the bestseller flag is set          |
 
 ## Getting Started
@@ -184,9 +187,24 @@ Endpoints marked 🔒 need an `Authorization: Bearer <token>` header, which the 
 | `DELETE`| `/cart/:id` 🔒                | Remove an item from the cart             |
 | `POST`  | `/orders` 🔒                  | Place an order from the cart (`name`, `phone`, `address`, `city`, `pincode`) |
 | `GET`   | `/orders` 🔒                  | The user's orders, newest first           |
-| `GET`   | `/orders/:id` 🔒              | A single order with its items and shipping address |
+| `GET`   | `/orders/:id` 🔒              | A single order with its items, shipping address and payment details |
+| `POST`  | `/orders/:id/pay` 🔒          | Pay for an order with `card`, `upi` or `cod` (simulated) |
 
-Errors are returned as JSON in the form `{ "error": "message" }` with a matching status code (`400`, `401`, `404`, `409`, `429` or `500`).
+Errors are returned as JSON in the form `{ "error": "message" }` with a matching status code (`400`, `401`, `402`, `404`, `409`, `429` or `500`).
+
+## Demo Payments
+
+Payments are simulated. No real payment gateway is used and no money is taken. Card numbers are checked with the Luhn algorithm and the expiry date must be in the future.
+
+| Method | Test value            | Result             |
+| :----- | :-------------------- | :----------------- |
+| Card   | `4242 4242 4242 4242` | Payment succeeds   |
+| Card   | `4000 0000 0000 0002` | Card declined      |
+| Card   | `4000 0000 0000 9995` | Insufficient funds |
+| UPI    | `demo@okaxis`         | Payment succeeds   |
+| UPI    | `fail@upi`            | Payment declined   |
+
+Use any name, any future expiry date and any 3 digit CVV. A declined payment leaves the order unpaid so it can be retried from the order page.
 
 ## Screenshots
 
@@ -203,7 +221,7 @@ Errors are returned as JSON in the form `{ "error": "message" }` with a matching
 
 - [x] Cart quantity updates and item removal
 - [x] Orders and order history
-- [ ] Simulated payment flow
+- [x] Simulated payment flow
 - [ ] Search, filters, sorting and pagination
 - [ ] Admin dashboard
 - [ ] Automated tests and CI
