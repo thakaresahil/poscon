@@ -98,7 +98,8 @@ describe("managing products", () => {
 
   test.each([
     [{ sellprice: 3000 }, "Sale price cannot be more than the original price"],
-    [{ img: "not-a-url" }, "Image must be a valid URL"],
+    [{ img: "not-a-url" }, "Image must be a full URL or a path like /products/shirt.svg"],
+    [{ img: "javascript:alert(1)" }, "Image must be a full URL or a path like /products/shirt.svg"],
     [{ category: "Tops & Tees" }, "Category can only use letters, numbers and dashes"],
   ])("validates product fields %#", async (change, message) => {
     const response = await api()

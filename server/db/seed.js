@@ -10,11 +10,12 @@ const demoUser = {
   address: "221B Baker Street, Mumbai",
 };
 
+// On a public deployment set ADMIN_PASSWORD so the admin account is not the documented demo one
 const adminUser = {
   name: "Store Admin",
-  email: "admin@poscon.dev",
+  email: process.env.ADMIN_EMAIL || "admin@poscon.dev",
   pnum: "9000000000",
-  password: "admin1234",
+  password: process.env.ADMIN_PASSWORD || "admin1234",
 };
 
 // With --if-empty the seed only runs on a database with no products, so it is
@@ -70,7 +71,11 @@ async function seed() {
     await db.query("COMMIT");
     console.log(`Seeded ${products.length} products, 1 demo user and 1 admin`);
     console.log(`Demo login: ${demoUser.email} / ${demoUser.password}`);
-    console.log(`Admin login: ${adminUser.email} / ${adminUser.password}`);
+    console.log(
+      process.env.ADMIN_PASSWORD
+        ? `Admin login: ${adminUser.email} (password from ADMIN_PASSWORD)`
+        : `Admin login: ${adminUser.email} / ${adminUser.password}`
+    );
   } catch (error) {
     await db.query("ROLLBACK");
     throw error;

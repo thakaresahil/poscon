@@ -7,5 +7,7 @@ if (!testDatabase.endsWith("_test")) {
 }
 
 process.env.PG_DATABASE = testDatabase;
+// A connection string would point somewhere other than the test database
+delete process.env.DATABASE_URL;
 process.env.SESSION_SECRET = process.env.SESSION_SECRET || "test-secret";
 process.env.AUTH_RATE_LIMIT = "10000";

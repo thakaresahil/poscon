@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+<defs><pattern id="motif" width="34" height="34" patternUnits="userSpaceOnUse"><rect width="34" height="34" fill="#8b1e3f"/><circle cx="17" cy="17" r="5" fill="none" stroke="#e0b84c" stroke-width="2"/><circle cx="17" cy="17" r="1.6" fill="#e0b84c"/><circle cx="0" cy="0" r="2" fill="#e0b84c"/><circle cx="34" cy="0" r="2" fill="#e0b84c"/><circle cx="0" cy="34" r="2" fill="#e0b84c"/><circle cx="34" cy="34" r="2" fill="#e0b84c"/></pattern></defs>
+<rect width="400" height="500" fill="#ead7dc"/>
+
+<ellipse cx="200" cy="462" rx="140" ry="12" fill="#000" opacity="0.07"/>
+<path d="M140,116 L100,300 L124,306 L156,190 Z" fill="#8b1e3f" stroke="#68172f" stroke-width="2" stroke-linejoin="round" /><g transform="translate(400,0) scale(-1,1)"><path d="M140,116 L100,300 L124,306 L156,190 Z" fill="#8b1e3f" stroke="#68172f" stroke-width="2" stroke-linejoin="round" /></g>
+<path d="M140,220 L68,454 Q200,478 332,454 L260,220 Z" fill="url(#motif)" stroke="#61152c" stroke-width="2" stroke-linejoin="round"/>
+<path d="M76,430 Q200,452 324,430 L332,454 Q200,478 68,454 Z" fill="#e0b84c"/>
+<path d="M178,96 L140,116 L142,222 L258,222 L260,116 L222,96 Q200,112 178,96 Z" fill="#8b1e3f" stroke="#68172f" stroke-width="2" stroke-linejoin="round" />
+<path d="M142,214 Q200,226 258,214 L258,224 Q200,236 142,224 Z" fill="#e0b84c"/>
+<path d="M178,96 Q200,130 222,96" fill="none" stroke="#e0b84c" stroke-width="4"/>
+<path d="M150,262 L130,440 M175,266 L170,452" fill="none" stroke="#761a36" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><g transform="translate(400,0) scale(-1,1)"><path d="M150,262 L130,440 M175,266 L170,452" fill="none" stroke="#761a36" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></g>
+</svg>

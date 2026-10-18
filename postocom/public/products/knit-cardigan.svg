@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+<defs><pattern id="knit" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#d6c4a8"/><path d="M0 0 L5 6 L10 0" fill="none" stroke="#bcac94" stroke-width="1.4"/></pattern></defs>
+<rect width="400" height="500" fill="#f3ede5"/>
+
+<ellipse cx="200" cy="458" rx="120" ry="12" fill="#000" opacity="0.07"/>
+<path d="M110,126 L68,322 L100,332 L130,205 Z" fill="url(#knit)" stroke="#NaNNaNNaN" stroke-width="2" stroke-linejoin="round" /><g transform="translate(400,0) scale(-1,1)"><path d="M110,126 L68,322 L100,332 L130,205 Z" fill="url(#knit)" stroke="#NaNNaNNaN" stroke-width="2" stroke-linejoin="round" /></g>
+<rect x="66" y="312" width="38" height="20" rx="3" fill="#c1b097" transform="rotate(12 85 322)"/><g transform="translate(400,0) scale(-1,1)"><rect x="66" y="312" width="38" height="20" rx="3" fill="#c1b097" transform="rotate(12 85 322)"/></g>
+<path d="M176,100 L110,126 L108,420 L292,420 L290,126 L224,100 L200,250 Z" fill="url(#knit)" stroke="#NaNNaNNaN" stroke-width="2" stroke-linejoin="round" />
+<path d="M176,100 L200,250 L224,100" fill="none" stroke="#bcac94" stroke-width="12" stroke-linejoin="round"/>
+<path d="M200,250 L200,420" stroke="#bcac94" stroke-width="12"/>
+<rect x="108" y="404" width="184" height="20" fill="#c1b097"/>
+<circle cx="206" cy="270" r="4.5" fill="#7c5a3a"/><circle cx="206" cy="310" r="4.5" fill="#7c5a3a"/><circle cx="206" cy="350" r="4.5" fill="#7c5a3a"/><circle cx="206" cy="390" r="4.5" fill="#7c5a3a"/>
+</svg>

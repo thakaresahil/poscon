@@ -55,8 +55,22 @@ const openapi = {
     { name: "Cart", description: "The logged-in user's cart" },
     { name: "Orders", description: "Checkout, order history and simulated payments" },
     { name: "Admin", description: "Store management, admin role required" },
+    { name: "Health", description: "Uptime checks" },
   ],
   paths: {
+    "/health": {
+      get: {
+        tags: ["Health"],
+        summary: "Check the API and database are up",
+        responses: {
+          200: json({ type: "object", properties: { status: { type: "string", example: "ok" } } }),
+          503: json(
+            { type: "object", properties: { status: { type: "string", example: "error" }, error: { type: "string" } } },
+            "The database cannot be reached"
+          ),
+        },
+      },
+    },
     "/signup/user": {
       post: {
         tags: ["Auth"],
@@ -583,7 +597,7 @@ const openapi = {
         properties: {
           namee: { type: "string", minLength: 2, maxLength: 255 },
           description: { type: "string", maxLength: 2000 },
-          img: { type: "string", format: "uri" },
+          img: { type: "string", description: "A full URL, or a path served by the frontend such as /products/shirt.svg" },
           price: { type: "integer", minimum: 1 },
           sellprice: { type: "integer", minimum: 1, description: "Cannot be more than `price`" },
           gender: { type: "string", enum: ["men", "women"] },

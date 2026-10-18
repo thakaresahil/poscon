@@ -1,0 +1,27 @@
+# Render Blueprint for the API. See docs/DEPLOYMENT.md for the full guide.
+services:
+  - type: web
+    name: poscon-api
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: server
+    buildCommand: npm ci --omit=dev
+    # Applies new migrations and seeds an empty database on every deploy
+    startCommand: npm run db:setup && node server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "1"
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: CLIENT_ORIGIN
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false

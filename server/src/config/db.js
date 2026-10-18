@@ -1,13 +1,20 @@
 import pg from "pg";
 import "dotenv/config";
 
-export const dbConfig = {
-  user: process.env.PG_USER,
-  host: process.env.PG_HOST,
-  database: process.env.PG_DATABASE,
-  password: process.env.PG_PASSWORD,
-  port: process.env.PG_PORT,
-};
+// Hosted databases such as Neon give a single connection string and require SSL.
+// Locally the separate PG_* variables are used instead.
+export const dbConfig = process.env.DATABASE_URL
+  ? {
+      connectionString: process.env.DATABASE_URL,
+      ssl: process.env.DATABASE_SSL === "false" ? false : { rejectUnauthorized: true },
+    }
+  : {
+      user: process.env.PG_USER,
+      host: process.env.PG_HOST,
+      database: process.env.PG_DATABASE,
+      password: process.env.PG_PASSWORD,
+      port: process.env.PG_PORT,
+    };
 
 const pool = new pg.Pool(dbConfig);
 
