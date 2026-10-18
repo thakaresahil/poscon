@@ -17,6 +17,11 @@ import Checkout from "./component/checkout/Checkout";
 import Orders from "./component/orders/Orders";
 import OrderDetail from "./component/orders/OrderDetail";
 import Payment from "./component/payment/Payment";
+import AdminRoute from "./component/routing/AdminRoute";
+import Dashboard from "./component/admin/Dashboard";
+import AdminProducts from "./component/admin/AdminProducts";
+import ProductForm from "./component/admin/ProductForm";
+import AdminOrders from "./component/admin/AdminOrders";
 
 const commonLayout = (component) => (
   <>
@@ -93,6 +98,46 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <Payment />
       </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin",
+    element: commonLayout(
+      <AdminRoute>
+        <Dashboard />
+      </AdminRoute>
+    ),
+  },
+  {
+    path: "/admin/products",
+    element: commonLayout(
+      <AdminRoute>
+        <AdminProducts />
+      </AdminRoute>
+    ),
+  },
+  {
+    path: "/admin/products/new",
+    element: commonLayout(
+      <AdminRoute>
+        <ProductForm />
+      </AdminRoute>
+    ),
+  },
+  {
+    path: "/admin/products/:id/edit",
+    element: commonLayout(
+      <AdminRoute>
+        <ProductForm />
+      </AdminRoute>
+    ),
+  },
+  {
+    path: "/admin/orders",
+    element: commonLayout(
+      <AdminRoute>
+        <AdminOrders />
+      </AdminRoute>
     ),
   },
   {

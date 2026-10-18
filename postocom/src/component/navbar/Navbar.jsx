@@ -13,6 +13,7 @@ function Navbar() {
   const [searchTerm, setSearchTerm] = useState("");
   const {
     isLoggedIn: loginstatus,
+    isAdmin,
     logout,
     authDialog,
     openLogin,
@@ -57,6 +58,7 @@ function Navbar() {
           <NavLink to="/contact">Contact</NavLink>
           <NavLink to="/about">About</NavLink>
           {loginstatus ? <NavLink to="/orders">My Orders</NavLink> : null}
+          {isAdmin ? <NavLink to="/admin">Admin</NavLink> : null}
           {!loginstatus ? (
             <button onClick={handleLoginComponent}>Log In</button>
           ) : (
@@ -193,6 +195,17 @@ function Navbar() {
                         className="block py-2 px-4 text-gray-900 rounded hover:bg-gray-100"
                       >
                         My Orders
+                      </NavLink>
+                    </li>
+                  ) : null}
+                  {isAdmin ? (
+                    <li>
+                      <NavLink
+                        to="/admin"
+                        onClick={() => setIsOpen(false)}
+                        className="block py-2 px-4 text-gray-900 rounded hover:bg-gray-100"
+                      >
+                        Admin
                       </NavLink>
                     </li>
                   ) : null}
