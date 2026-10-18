@@ -3,7 +3,8 @@ import { Link, NavLink } from "react-router-dom";
 import api from "../../api/client";
 import Loading from "../loading/Loading";
 import OrderStatus from "./OrderStatus";
-import { formatDate, formatOrderNumber } from "../../utils/format";
+import PaymentStatus from "./PaymentStatus";
+import { formatDate, formatOrderNumber, needsPayment } from "../../utils/format";
 
 function Orders() {
   const [orders, setOrders] = useState([]);
@@ -66,6 +67,9 @@ function Orders() {
           <div className="flex flex-col items-end gap-2">
             <p className="font-semibold text-lg">₹{order.total}</p>
             <OrderStatus status={order.status} />
+            {needsPayment(order.payment_status) && (
+              <PaymentStatus status={order.payment_status} />
+            )}
           </div>
         </Link>
       ))}
