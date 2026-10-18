@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 
 function Acat() {
   return (
-    <div className="container mx-auto my-6">
+    <div className="page my-6">
       <div className="container mx-auto flex flex-col md:flex-row justify-around items-center gap-6">
         <Link
           to="/browseproduct?gender=women"
-          className="block relative w-96  transform transition-transform duration-300 hover:scale-105"
+          className="block relative w-full max-w-sm overflow-hidden rounded-lg transform transition-transform duration-300 hover:scale-105"
         >
           <img
             src="./images/acatoneforcat.jpg"
@@ -18,7 +18,7 @@ function Acat() {
         </Link>
         <Link
           to="/browseproduct?category=accessories"
-          className="block relative w-96  transform transition-transform duration-300 hover:scale-105"
+          className="block relative w-full max-w-sm overflow-hidden rounded-lg transform transition-transform duration-300 hover:scale-105"
         >
           <img
             src="./images/accessoriescat.jpg"
@@ -29,7 +29,7 @@ function Acat() {
         </Link>
         <Link
           to="/browseproduct?gender=men"
-          className="block relative w-96  transform transition-transform duration-300 hover:scale-105"
+          className="block relative w-full max-w-sm overflow-hidden rounded-lg transform transition-transform duration-300 hover:scale-105"
         >
           <img
             src="./images/acatthreeforcat.jpg"

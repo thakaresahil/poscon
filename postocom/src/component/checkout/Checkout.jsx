@@ -8,7 +8,7 @@ const inputClass = "input mb-4";
 
 function Checkout() {
   const navigate = useNavigate();
-  const { items, loading, count, total, placeOrder } = useCart();
+  const { items, ready, count, total, placeOrder } = useCart();
   const [shipping, setShipping] = useState({
     name: "",
     phone: "",
@@ -62,7 +62,7 @@ function Checkout() {
     }
   };
 
-  if (loading && items.length === 0) {
+  if (!ready) {
     return (
       <div className="my-16">
         <Loading />

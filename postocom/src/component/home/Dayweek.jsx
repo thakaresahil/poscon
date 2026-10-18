@@ -20,20 +20,20 @@ function Dayweek() {
             <h2 className="text-3xl">Deal Of The Week</h2>
             <div className="border-4 border-red-500 w-20 "></div>
           </div>
-          <div className="flex justify-around items-center gap-4">
-            <div className="flex flex-col justify-around items-center bg-white rounded-full px-6 py-3">
+          <div className="flex justify-around items-center gap-2 sm:gap-4">
+            <div className="flex flex-col justify-around items-center bg-white rounded-full px-3 py-3 sm:px-6">
               <h2 className="text-4xl text-red-500 font-bold ">04</h2>
               <p>Days</p>
             </div>
-            <div className="flex flex-col justify-around items-center bg-white rounded-full px-6 py-3">
+            <div className="flex flex-col justify-around items-center bg-white rounded-full px-3 py-3 sm:px-6">
               <h2 className="text-4xl text-red-500 font-bold ">23</h2>
               <p>Hours</p>
             </div>
-            <div className="flex flex-col justify-around items-center bg-white rounded-full px-6 py-3">
+            <div className="flex flex-col justify-around items-center bg-white rounded-full px-3 py-3 sm:px-6">
               <h2 className="text-4xl text-red-500 font-bold ">58</h2>
               <p>Mins</p>
             </div>
-            <div className="flex flex-col justify-around items-center bg-white rounded-full px-6 py-3">
+            <div className="flex flex-col justify-around items-center bg-white rounded-full px-3 py-3 sm:px-6">
               <h2 className="text-4xl text-red-500 font-bold ">52</h2>
               <p>Sec</p>
             </div>

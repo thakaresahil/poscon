@@ -38,6 +38,8 @@ function Productbrowse() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [priceInput, setPriceInput] = useState({ min: minPrice, max: maxPrice });
+  // Filters are always visible on larger screens and open as a panel on phones
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     api
@@ -101,10 +103,23 @@ function Productbrowse() {
   const lastItem = Math.min(page * PAGE_SIZE, result.total);
 
   return (
-    <div className="container mx-auto flex flex-col md:flex-row gap-8 my-12 px-4">
-      <aside className="flex flex-col gap-6 md:w-64 shrink-0">
+    <div className="page my-8 flex flex-col gap-6 md:my-12 md:flex-row md:gap-8">
+      <button
+        type="button"
+        className="btn btn-secondary md:hidden"
+        aria-expanded={showFilters}
+        aria-controls="product-filters"
+        onClick={() => setShowFilters(!showFilters)}
+      >
+        {showFilters ? "Hide filters" : "Filters"}
+        {hasFilters && !showFilters ? <span className="rounded-full bg-red-500 px-2 text-xs text-white">On</span> : null}
+      </button>
+      <aside
+        id="product-filters"
+        className={`${showFilters ? "flex" : "hidden"} shrink-0 flex-col gap-6 rounded-lg border border-gray-200 p-4 md:flex md:w-60 md:border-0 md:p-0`}
+      >
         <div className="flex flex-col items-start gap-2">
-          <h2 className="text-2xl">Shop</h2>
+          <h2 className="section-title">Shop</h2>
           <button
             className={filterButtonClass(!hasFilters && sort === "newest")}
             onClick={() => setSearchParams({ sort: "newest" })}
@@ -228,7 +243,7 @@ function Productbrowse() {
             </button>
           </div>
         ) : (
-          <div className="flex flex-wrap justify-around items-center gap-6">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6">
             {result.products.map((productItem) => (
               <Cards
                 key={productItem.id}

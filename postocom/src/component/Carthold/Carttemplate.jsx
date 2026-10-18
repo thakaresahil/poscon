@@ -3,68 +3,63 @@ import { Link } from "react-router-dom";
 import { MAX_QUANTITY } from "../../context/CartContext";
 
 function Carttemplate({
-  id,
   product_id,
   quantity,
   namee,
-  description,
   img,
   price,
-  gender,
   category,
+  size,
   sellprice,
   onQuantityChange,
   onRemove,
 }) {
   const discPercents = Math.floor(((price - sellprice) / price) * 100);
   return (
-    <div className="flex gap-6 justify-start items-start m-2">
-      <Link to={`/product/${product_id}`}>
-        <img src={img} alt={namee} className="h-72 " />
+    <div className="flex gap-4 py-5">
+      <Link to={`/product/${product_id}`} className="w-24 shrink-0 sm:w-28">
+        <img src={img} alt={namee} className="aspect-[4/5] w-full rounded-md bg-gray-50 object-cover" />
       </Link>
-      <div className="flex flex-col items-start gap-1">
-        <Link to={`/product/${product_id}`} className="font-semibold text-xl ">
-          {namee}
-        </Link>
-        <p><span className="font-semibold">Category: </span> {category}</p>
-        <div className="flex justify-start items-center gap-2">
-          <p>
-            At{" "}
-            <span className="font-light text-gray-400 line-through ">
-              ₹{price}
-            </span>{" "}
-            <span className="font-semibold ">₹{sellprice}</span>
-            <span className="text-red-400 ">({discPercents}%OFF)</span>
-          </p>
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <div className="flex items-start justify-between gap-3">
+          <Link to={`/product/${product_id}`} className="font-semibold hover:text-red-600">
+            {namee}
+          </Link>
+          <p className="shrink-0 font-semibold">₹{sellprice * quantity}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="font-semibold">Quantity: </span>
-          <div className="flex justify-center items-center border">
+        <p className="text-sm capitalize text-gray-600">
+          {category}
+          {size ? <> · Size <span className="font-medium uppercase text-gray-900">{size}</span></> : null}
+        </p>
+        <p className="flex flex-wrap items-baseline gap-x-2 text-sm">
+          <span className="price">₹{sellprice}</span>
+          <span className="price-old">₹{price}</span>
+          {discPercents > 0 && <span className="discount">({discPercents}% OFF)</span>}
+        </p>
+        <div className="mt-2 flex items-center justify-between gap-3">
+          <div className="flex items-center rounded-md border border-gray-300">
             <button
               onClick={() => onQuantityChange(quantity - 1)}
               disabled={quantity <= 1}
-              className="m-0 p-1 px-3 disabled:text-gray-300"
+              className="h-9 w-9 disabled:text-gray-300"
               aria-label={`Decrease quantity of ${namee}`}
             >
               -
             </button>
-            <span className="p-1 px-3">{quantity}</span>
+            <span className="w-8 text-center" aria-label="Quantity">{quantity}</span>
             <button
               onClick={() => onQuantityChange(quantity + 1)}
               disabled={quantity >= MAX_QUANTITY}
-              className="m-0 p-1 px-3 disabled:text-gray-300"
+              className="h-9 w-9 disabled:text-gray-300"
               aria-label={`Increase quantity of ${namee}`}
             >
               +
             </button>
           </div>
+          <button onClick={onRemove} className="text-sm font-medium text-gray-600 hover:text-red-600">
+            Remove
+          </button>
         </div>
-        <p><span className="font-semibold">Item Total: </span>₹{sellprice * quantity}</p>
-        <p><span className="font-semibold">Gender: </span>{gender}</p>
-        <p>{description}</p>
-        <button onClick={onRemove} className="text-red-500 hover:underline mt-2">
-          Remove
-        </button>
       </div>
     </div>
   );
