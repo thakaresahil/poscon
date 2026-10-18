@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Profile from "./Profile";
 import Cart from "./Cart";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Login from "../signupin/Login";
 import Register from "../signupin/Register";
 import { useAuth } from "../../context/AuthContext";
 
 function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const {
     isLoggedIn: loginstatus,
     logout,
@@ -18,8 +20,17 @@ function Navbar() {
     closeAuthDialog,
   } = useAuth();
 
-  const handleformsearch = () => {
-    console.log("handleFormsearch");
+  // Keep the search box in sync with the search shown on the browse page
+  useEffect(() => {
+    if (location.pathname === "/browseproduct") {
+      setSearchTerm(new URLSearchParams(location.search).get("q") || "");
+    }
+  }, [location]);
+
+  const handleformsearch = (event) => {
+    event.preventDefault();
+    const term = searchTerm.trim();
+    navigate(term ? `/browseproduct?q=${encodeURIComponent(term)}` : "/browseproduct");
   };
   const handleLoginComponent = () => {
     setIsOpen(false);
@@ -55,15 +66,20 @@ function Navbar() {
         <div className="flex justify-end items-center gap-2">
           <div className="flex justify-around items-center gap-4">
             <form
+              role="search"
               onSubmit={handleformsearch}
               className="flex items-center p-1 bg-slate-200 rounded"
             >
               <input
-                type="text"
+                type="search"
+                name="search"
+                aria-label="Search products"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
                 placeholder="Search"
                 className="flex-1 p-1 bg-transparent border-none focus:outline-none placeholder-slate-400"
               />
-              <button className="p-1">
+              <button type="submit" className="p-1" aria-label="Search">
                 <svg
                   fill="none"
                   stroke="currentColor"

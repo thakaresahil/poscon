@@ -17,10 +17,12 @@ async function seed() {
     await db.query("BEGIN");
     await db.query("TRUNCATE payments, order_items, orders, cart, products, users RESTART IDENTITY CASCADE");
 
-    for (const product of products) {
+    for (const [index, product] of products.entries()) {
+      // Spread arrival dates so the newest products come last in the list
+      const daysAgo = products.length - index;
       await db.query(
-        `INSERT INTO products (namee, description, img, price, sellprice, gender, category, is_bestseller)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        `INSERT INTO products (namee, description, img, price, sellprice, gender, category, is_bestseller, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW() - $9 * INTERVAL '1 day')`,
         [
           product.namee,
           product.description,
@@ -30,6 +32,7 @@ async function seed() {
           product.gender,
           product.category,
           product.bestseller || false,
+          daysAgo,
         ]
       );
     }
