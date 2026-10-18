@@ -14,7 +14,9 @@ Poscon is a full-stack e-commerce store for clothing and accessories. Shoppers c
 - Product pages with their own shareable URL (`/product/:id`), discount pricing and quantity selection
 - Account signup, login and logout with hashed passwords (bcrypt) and JWT authentication
 - Shared login state across the app, protected cart and profile pages, and automatic logout when a session expires
-- Cart and checkout tied to the logged-in user
+- Cart with quantity controls, item removal, live subtotal and a navbar item count badge
+- Adding a product that is already in the cart increases its quantity instead of duplicating it
+- Checkout tied to the logged-in user
 - Profile page for the logged-in user
 - Custom 404 page for unknown URLs
 - Database migrations and seed data, so the whole app can be set up with one command
@@ -49,7 +51,7 @@ poscon/
 ├── postocom/              # React frontend
 │   └── src/
 │       ├── api/client.js  # Shared axios client (base URL, auth header, session expiry)
-│       ├── context/       # Auth context (login state and login dialog)
+│       ├── context/       # Auth and cart state shared across the app
 │       └── component/     # Pages and UI components
 ├── server/                # Express API
 │   ├── server.js          # Entry point
@@ -75,7 +77,7 @@ poscon/
 | :----------- | :------------------------------------------------------------- |
 | `users`      | Accounts with email, phone number and bcrypt password hash     |
 | `products`   | Catalogue with price, sale price, gender, category, bestseller flag |
-| `cart`       | Items a user has added (`status` 0 = in cart, 1 = purchased)    |
+| `cart`       | Items a user has added (`status` 0 = in cart, 1 = purchased), one row per product in the active cart |
 | `bestseller` | View over `products` where the bestseller flag is set          |
 
 ## Getting Started
@@ -173,7 +175,9 @@ Endpoints marked 🔒 need an `Authorization: Bearer <token>` header, which the 
 | `GET`   | `/products/:id`               | A single product                         |
 | `GET`   | `/profile` 🔒                 | Logged-in user's profile                 |
 | `GET`   | `/cartdata` 🔒                | Items in the user's cart                 |
-| `POST`  | `/addtocart` 🔒               | Add a product to the cart (`pid`, `count`) |
+| `POST`  | `/addtocart` 🔒               | Add a product to the cart, or increase its quantity (`pid`, `count`) |
+| `PATCH` | `/cart/:id` 🔒                | Change the quantity of a cart item (`quantity`, 1 to 10) |
+| `DELETE`| `/cart/:id` 🔒                | Remove an item from the cart             |
 | `PATCH` | `/buyitem` 🔒                 | Check out cart items (`pid` array)        |
 
 Errors are returned as JSON in the form `{ "error": "message" }` with a matching status code (`400`, `401`, `404`, `409`, `429` or `500`).
@@ -191,7 +195,7 @@ Errors are returned as JSON in the form `{ "error": "message" }` with a matching
 
 ## Roadmap
 
-- [ ] Cart quantity updates and item removal
+- [x] Cart quantity updates and item removal
 - [ ] Orders and order history
 - [ ] Simulated payment flow
 - [ ] Search, filters, sorting and pagination

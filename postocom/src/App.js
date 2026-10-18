@@ -4,6 +4,7 @@ import Navbar from "./component/navbar/Navbar";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
 import ProtectedRoute from "./component/routing/ProtectedRoute";
 import Productbrowse from "./component/product/Productbrowse";
 import ProductPage from "./component/product/ProductPage";
@@ -67,7 +68,9 @@ const router = createBrowserRouter([
 function App() {
   return (
     <AuthProvider>
-      <RouterProvider router={router} />
+      <CartProvider>
+        <RouterProvider router={router} />
+      </CartProvider>
     </AuthProvider>
   );
 }

@@ -14,7 +14,7 @@ function Detailedview({
   const [count, setCount] = useState(1);
   // console.log(description);
   const increment = () => {
-    setCount((prevCount) => prevCount + 1);
+    setCount((prevCount) => (prevCount < 10 ? prevCount + 1 : 10));
   };
 
   const decrement = () => {
