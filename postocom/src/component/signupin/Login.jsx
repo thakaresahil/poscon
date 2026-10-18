@@ -63,7 +63,9 @@ function Login({ open, handleClose, handleRegister }) {
         }
       })
       .catch((error) => {
-        console.error("Error making the request:", error);
+        setFormError(
+          error.response?.data?.error || "Something went wrong, please try again."
+        );
       });
   }
 

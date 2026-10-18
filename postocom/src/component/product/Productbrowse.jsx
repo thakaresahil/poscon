@@ -10,7 +10,6 @@ function Productbrowse() {
   const [filterCategory, setFilterCategory] = useState("");
   const [productData, setProductData] = useState([]);
   const [view, setView] = useState(null);
-  const uidcheck = localStorage.getItem("uid");
   const tokencheck = localStorage.getItem("token");
   const [viewData, setViewData] = useState({
     id: "",
@@ -68,7 +67,12 @@ function Productbrowse() {
       await axios.post(
         `http://localhost:9000/addtocart`,
         cart,
-        { headers: { "Content-Type": "application/json" } }
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${tokencheck}`,
+          },
+        }
       ).then((response) => {
         try {
           const result = response.data;
@@ -86,15 +90,14 @@ function Productbrowse() {
   };
 
   const handleAddToCart = (id, count) => {
-    if (!uidcheck) {
+    if (!tokencheck) {
       navigate("/");
+      return;
     }
-    
+
     const newCartItem = {
-      uid: uidcheck,
       pid: id,
       count: count,
-      token: tokencheck,
     };
     addtocart(newCartItem);
   };

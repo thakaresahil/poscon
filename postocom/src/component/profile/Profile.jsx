@@ -5,17 +5,19 @@ import { useNavigate } from 'react-router-dom';
 function Profile() {
     const navigate = useNavigate();
     const localcheck = localStorage.getItem('token');
-    const uid = localStorage.getItem('uid');
     const [pdata, setPdata] = useState("");
     const [loading, setLoading] = useState(false);
     useEffect(() => {
       if(!localcheck){
         navigate("/");
+        return;
       }
       const fetchData = async () => {
         try {
             setPdata("");
-            const response = await axios.get(`http://localhost:9000/profile/${encodeURIComponent(uid)}`);
+            const response = await axios.get("http://localhost:9000/profile", {
+                headers: { Authorization: `Bearer ${localcheck}` },
+            });
             setPdata(response.data);
         } catch (error) {
             console.log("Error Fetching Profile", error);

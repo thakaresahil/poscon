@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 
 function Carthole() {
   const navigate = useNavigate();
-  const uidcheck = localStorage.getItem("uid");
   const token = localStorage.getItem("token");
   const [loading, setLoading] = useState(false);
   const [cartitemdata, setCartItemData] = useState([]);
@@ -16,8 +15,8 @@ function Carthole() {
     const fetchData = async () => {
       try {
         await axios
-          .post("http://localhost:9000/cartdata", details, {
-            headers: { "Content-Type": "application/json" },
+          .get("http://localhost:9000/cartdata", {
+            headers: { Authorization: `Bearer ${token}` },
           })
           .then((response) => {
             setCartItemData(response.data);
@@ -29,12 +28,12 @@ function Carthole() {
         setLoading(true);
       }
     };
-    const details = {
-      uid: uidcheck,
-      token: token,
-    };
-    fetchData(details);
-  }, [uidcheck, token]);
+    if (!token) {
+      navigate("/");
+      return;
+    }
+    fetchData();
+  }, [token, navigate]);
 
   useEffect(() => {
     // Calculate total price whenever productData changes
@@ -53,13 +52,14 @@ function Carthole() {
       });
       const buydetails = {
         pid: pid,
-        uid: uidcheck,
-        token: token,
       };
       try {
         await axios
           .patch("http://localhost:9000/buyitem", buydetails, {
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
           })
           .then((response) => {
             try {
