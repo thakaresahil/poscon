@@ -25,3 +25,15 @@ export const getProductsByCategory = async (req, res) => {
   const products = await db.query(query);
   res.json(products.rows);
 };
+
+export const getProductById = async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(404).json({ error: "Product not found" });
+  }
+  const product = await db.query("SELECT * FROM products WHERE id = $1", [id]);
+  if (product.rowCount === 0) {
+    return res.status(404).json({ error: "Product not found" });
+  }
+  res.json(product.rows[0]);
+};

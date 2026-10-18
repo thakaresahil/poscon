@@ -1,17 +1,10 @@
 import api from "../../api/client";
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom';
 
 function Profile() {
-    const navigate = useNavigate();
-    const localcheck = localStorage.getItem('token');
     const [pdata, setPdata] = useState("");
     const [loading, setLoading] = useState(false);
     useEffect(() => {
-      if(!localcheck){
-        navigate("/");
-        return;
-      }
       const fetchData = async () => {
         try {
             setPdata("");
@@ -25,7 +18,7 @@ function Profile() {
         }
       }
       fetchData();
-    }, [localcheck, navigate])
+    }, [])
     
 
 

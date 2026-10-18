@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 
 function Carthole() {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
   const [loading, setLoading] = useState(false);
   const [cartitemdata, setCartItemData] = useState([]);
   const pid = [];
@@ -22,12 +21,8 @@ function Carthole() {
         setLoading(true);
       }
     };
-    if (!token) {
-      navigate("/");
-      return;
-    }
     fetchData();
-  }, [token, navigate]);
+  }, []);
 
   useEffect(() => {
     // Calculate total price whenever productData changes

@@ -1,22 +1,11 @@
 import api from "../../api/client";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Dialog } from "@mui/material";
 
 function Register({ open, handleClose, handleLoginComponent}) {
-  const navigate = useNavigate();
   const [passwordError, setPasswordError] = useState("");
   const [redirecttologin, setRedirecttologin] = useState("");
   const [formError, setFormError] = useState("");
-  const localcheck = localStorage.getItem("email");
-  useEffect(() => {
-    if (localcheck) {
-      navigate("/");
-    }
-  }, [localcheck, navigate]);
-
-  // Calculate the date 14 years ago from today
-
   const [signupdata, setData] = useState({
     email: "",
     pnum: "",

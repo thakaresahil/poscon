@@ -1,14 +1,10 @@
 import api from "../../api/client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Dialog } from "@mui/material";
+import { useAuth } from "../../context/AuthContext";
 
 function Login({ open, handleClose, handleRegister }) {
-  const localcheck = localStorage.getItem("token");
-  useEffect(() => {
-    if (localcheck) {
-      handleClose();
-    }
-  }, [localcheck, handleClose]);
+  const { login } = useAuth();
 
   const [logindata, setData] = useState({
     email: "",
@@ -35,19 +31,7 @@ function Login({ open, handleClose, handleRegister }) {
     api
       .post("/login", logindata)
       .then((response) => {
-        try {
-          const result = response.data;
-          if (result.error) {
-            setFormError(result.error);
-          }
-          else{
-            localStorage.setItem("uid", result.uid);
-            localStorage.setItem("token", result.token);
-            handleClose();
-          }
-        } catch (error) {
-          console.error("Error parsing JSON:", error);
-        }
+        login(response.data.token, response.data.uid);
       })
       .catch((error) => {
         setFormError(
@@ -60,11 +44,7 @@ function Login({ open, handleClose, handleRegister }) {
     event.preventDefault();
     setRedirecttosignup("");
     setWrongPassword("");
-    if (localStorage.getItem("token") !== null){
-      handleClose();
-    } else {
-      loggerin();
-    }
+    loggerin();
   }
 
   return (

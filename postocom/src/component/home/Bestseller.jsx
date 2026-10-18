@@ -2,20 +2,10 @@ import React, { useEffect, useState } from "react";
 import api from "../../api/client";
 import Loading from "../loading/Loading";
 import Cards from "../cards/Cards";
-import Detailedview from "../detailed/Detailedview";
 
 function Bestseller() {
   const [bsell, setBsell] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState(null);
-  const [viewData, setViewData] = useState({
-    id: "",
-    img: "",
-    name: "",
-    orgprice: "",
-    sellprice: "",
-    description: "",
-  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,25 +21,6 @@ function Bestseller() {
     fetchData();
   }, []);
 
-  const handleViewDetails = (
-    id,
-    img,
-    name,
-    orgprice,
-    sellprice,
-    description
-  ) => {
-    setView(id);
-    setViewData({
-      id,
-      img,
-      name,
-      orgprice,
-      sellprice,
-      description,
-    });
-  };
-
   return (
     <div className="container mx-auto flex flex-col justify-around items-center">
       <div className="flex flex-col items-center justify-around gap-3">
@@ -59,7 +30,7 @@ function Bestseller() {
       <div className="flex flex-wrap mx-24 gap-6 justify-around items-center my-8">
         {loading ? (
           <Loading />
-        ) : view === null ? (
+        ) : (
           bsell.length > 0 ? (
             bsell.map((newItem) => (
               <Cards
@@ -69,23 +40,11 @@ function Bestseller() {
                 name={newItem.name}
                 orgprice={newItem.price}
                 sellprice={newItem.sellprice}
-                description={newItem.description}
-                onViewDetails={handleViewDetails}
               />
             ))
           ) : (
             <p>No best sellers found.</p>
           )
-        ) : (
-          <Detailedview
-            key={view}
-            id={viewData.id}
-            img={viewData.img}
-            name={viewData.name}
-            orgprice={viewData.orgprice}
-            sellprice={viewData.sellprice}
-            description={viewData.description}
-          />
         )}
       </div>
     </div>
