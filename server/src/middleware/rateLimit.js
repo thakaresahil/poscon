@@ -8,3 +8,12 @@ export const authLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: "Too many attempts, please try again later" },
 });
+
+// Stops the public contact form being used to flood the inbox
+export const contactLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: Number(process.env.CONTACT_RATE_LIMIT) || 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "You have sent several messages already, please try again later" },
+});

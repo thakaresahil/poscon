@@ -34,7 +34,7 @@ async function seed() {
       }
     }
     await db.query("BEGIN");
-    await db.query("TRUNCATE payments, order_items, orders, cart, products, users RESTART IDENTITY CASCADE");
+    await db.query("TRUNCATE contact_messages, payments, order_items, orders, cart, products, users RESTART IDENTITY CASCADE");
 
     for (const [index, product] of products.entries()) {
       // Spread arrival dates so the newest products come last in the list

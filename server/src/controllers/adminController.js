@@ -20,7 +20,8 @@ export const getStats = async (req, res) => {
          (SELECT COUNT(*)::int FROM orders) AS orders,
          (SELECT COUNT(*)::int FROM orders WHERE status = 'placed') AS orders_to_ship,
          (SELECT COUNT(*)::int FROM users WHERE NOT is_admin) AS customers,
-         (SELECT COUNT(*)::int FROM products) AS products`
+         (SELECT COUNT(*)::int FROM products) AS products,
+         (SELECT COUNT(*)::int FROM contact_messages WHERE status = 'new') AS new_messages`
     ),
     db.query(
       `SELECT TO_CHAR(day, 'YYYY-MM-DD') AS day,

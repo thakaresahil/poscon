@@ -43,7 +43,17 @@ function Dashboard() {
             />
             <StatTile label="Orders" value={stats.orders} hint={`${stats.orders_to_ship} waiting to ship`} />
             <StatTile label="Customers" value={stats.customers} />
-            <StatTile label="Products" value={stats.products} />
+            <StatTile
+              label="Products"
+              value={stats.products}
+              hint={
+                stats.new_messages > 0 ? (
+                  <Link to="/admin/messages?status=new" className="link">
+                    {stats.new_messages} unread {stats.new_messages === 1 ? "message" : "messages"}
+                  </Link>
+                ) : "No unread messages"
+              }
+            />
           </div>
 
           <div className="bg-white border rounded p-4">

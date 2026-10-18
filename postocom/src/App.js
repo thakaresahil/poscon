@@ -26,6 +26,7 @@ import Dashboard from "./component/admin/Dashboard";
 import AdminProducts from "./component/admin/AdminProducts";
 import ProductForm from "./component/admin/ProductForm";
 import AdminOrders from "./component/admin/AdminOrders";
+import AdminMessages from "./component/admin/AdminMessages";
 
 const commonLayout = (component) => (
   <>
@@ -150,6 +151,14 @@ const router = createBrowserRouter([
     element: commonLayout(
       <AdminRoute>
         <ProductForm />
+      </AdminRoute>
+    ),
+  },
+  {
+    path: "/admin/messages",
+    element: commonLayout(
+      <AdminRoute>
+        <AdminMessages />
       </AdminRoute>
     ),
   },

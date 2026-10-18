@@ -31,6 +31,7 @@ export default defineConfig({
         CLIENT_ORIGIN: `http://localhost:${APP_PORT}`,
         SESSION_SECRET: process.env.SESSION_SECRET || "e2e-secret",
         AUTH_RATE_LIMIT: "10000",
+        CONTACT_RATE_LIMIT: "10000",
       },
     },
     {

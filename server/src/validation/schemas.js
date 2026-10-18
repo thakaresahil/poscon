@@ -127,3 +127,24 @@ export const adminOrderQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });
+
+export const contactSchema = z.object({
+  name: z.string().trim().min(2, "Please enter your name").max(100),
+  email: z.string().trim().toLowerCase().email("Please enter a valid email"),
+  subject: z.string().trim().max(150).default(""),
+  message: z
+    .string()
+    .trim()
+    .min(10, "Please write at least 10 characters")
+    .max(2000, "Messages can be up to 2000 characters"),
+});
+
+export const messageQuerySchema = z.object({
+  status: z.enum(["new", "read"], { message: "Status must be new or read" }).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+});
+
+export const messageStatusSchema = z.object({
+  status: z.enum(["new", "read"], { message: "Status must be new or read" }),
+});

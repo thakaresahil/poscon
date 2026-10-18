@@ -10,6 +10,7 @@ import cartRoutes from "./routes/cartRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
 import { errorHandler, notFound } from "./middleware/errorHandler.js";
 import openapi from "./docs/openapi.js";
 
@@ -48,6 +49,7 @@ app.use(cartRoutes);
 app.use(profileRoutes);
 app.use(orderRoutes);
 app.use(adminRoutes);
+app.use(contactRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

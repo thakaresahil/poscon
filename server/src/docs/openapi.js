@@ -55,6 +55,7 @@ const openapi = {
     { name: "Cart", description: "The logged-in user's cart" },
     { name: "Orders", description: "Checkout, order history and simulated payments" },
     { name: "Admin", description: "Store management, admin role required" },
+    { name: "Contact", description: "Messages from the contact form" },
     { name: "Health", description: "Uptime checks" },
   ],
   paths: {
@@ -389,6 +390,89 @@ const openapi = {
           ),
           404: responses.NotFound,
           409: errorResponse("The order is already paid", "Payment for this order is already complete"),
+        },
+      },
+    },
+    "/contact": {
+      post: {
+        tags: ["Contact"],
+        summary: "Send a message to the store",
+        description: "No login needed. Limited to 5 messages per 15 minutes from one address.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: ref("ContactRequest"),
+              example: { name: "Asha Rao", email: "asha@example.com", subject: "Order question", message: "When will my order ship?" },
+            },
+          },
+        },
+        responses: {
+          201: json(
+            {
+              type: "object",
+              properties: {
+                status: { type: "string", example: "Sent" },
+                id: { type: "integer" },
+                created_at: { type: "string", format: "date-time" },
+              },
+            },
+            "Message saved"
+          ),
+          400: responses.BadRequest,
+          429: { $ref: "#/components/responses/TooManyRequests" },
+        },
+      },
+    },
+    "/admin/messages": {
+      get: {
+        tags: ["Admin"],
+        summary: "Messages from the contact form, newest first",
+        security: loggedIn,
+        parameters: [
+          { name: "status", in: "query", schema: { type: "string", enum: ["new", "read"] } },
+          { name: "page", in: "query", schema: { type: "integer", minimum: 1, default: 1 } },
+          { name: "limit", in: "query", schema: { type: "integer", minimum: 1, maximum: 50, default: 20 } },
+        ],
+        responses: {
+          200: json({
+            type: "object",
+            properties: {
+              messages: { type: "array", items: ref("ContactMessage") },
+              total: { type: "integer" },
+              unread: { type: "integer", description: "Messages with status new, ignoring the filter" },
+              page: { type: "integer" },
+              limit: { type: "integer" },
+              totalPages: { type: "integer" },
+            },
+          }),
+          400: responses.BadRequest,
+          401: responses.Unauthorized,
+          403: responses.Forbidden,
+        },
+      },
+    },
+    "/admin/messages/{id}": {
+      patch: {
+        tags: ["Admin"],
+        summary: "Mark a message as read or new",
+        security: loggedIn,
+        parameters: [idParam("Message id")],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { type: "object", required: ["status"], properties: { status: { type: "string", enum: ["new", "read"] } } },
+              example: { status: "read" },
+            },
+          },
+        },
+        responses: {
+          200: json({ type: "object", properties: { id: { type: "integer" }, status: { type: "string" } } }),
+          400: responses.BadRequest,
+          401: responses.Unauthorized,
+          403: responses.Forbidden,
+          404: responses.NotFound,
         },
       },
     },
@@ -740,6 +824,28 @@ const openapi = {
         ],
         discriminator: { propertyName: "method" },
       },
+      ContactRequest: {
+        type: "object",
+        required: ["name", "email", "message"],
+        properties: {
+          name: { type: "string", minLength: 2, maxLength: 100 },
+          email: { type: "string", format: "email" },
+          subject: { type: "string", maxLength: 150 },
+          message: { type: "string", minLength: 10, maxLength: 2000 },
+        },
+      },
+      ContactMessage: {
+        type: "object",
+        properties: {
+          id: { type: "integer" },
+          name: { type: "string" },
+          email: { type: "string" },
+          subject: { type: "string" },
+          message: { type: "string" },
+          status: { type: "string", enum: ["new", "read"] },
+          created_at: { type: "string", format: "date-time" },
+        },
+      },
       AdminOrder: {
         type: "object",
         properties: {
@@ -763,6 +869,7 @@ const openapi = {
           orders_to_ship: { type: "integer" },
           customers: { type: "integer" },
           products: { type: "integer" },
+          new_messages: { type: "integer", description: "Unread contact form messages" },
           daily: {
             type: "array",
             description: "One entry per day for the last 30 days",
