@@ -12,7 +12,7 @@
     "db:reset": "node db/reset.js && node db/migrate.js && node db/seed.js"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
