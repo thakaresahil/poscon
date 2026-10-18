@@ -4,7 +4,7 @@
 
 Poscon is a full-stack e-commerce store for clothing and accessories. Shoppers can browse products by category, view product details, sign up and log in, add items to a cart and check out.
 
-**Live demo:** _coming soon_
+**Live demo:** _coming soon_ · [How to deploy your own copy](docs/DEPLOYMENT.md)
 
 **Demo accounts** (created by the seed script):
 
@@ -13,7 +13,7 @@ Poscon is a full-stack e-commerce store for clothing and accessories. Shoppers c
 | Customer | `demo@poscon.dev`  | `demo1234`  |
 | Admin    | `admin@poscon.dev` | `admin1234` |
 
-![Home page](demo/Home.png)
+![Home page](demo/Home.jpg)
 
 ## Features
 
@@ -96,6 +96,8 @@ poscon/
 ├── e2e/                   # Playwright end-to-end tests
 ├── .github/workflows/     # CI pipeline
 ├── docker-compose.yml     # PostgreSQL, API and frontend in containers
+├── docs/                  # Deployment guide
+├── render.yaml            # Render configuration for the API
 └── demo/                  # Screenshots
 ```
 
@@ -181,6 +183,10 @@ The app opens at `http://localhost:3000`.
 | `PG_DATABASE`    | Database name                                       |
 | `PG_PASSWORD`    | PostgreSQL password                                 |
 | `PG_PORT`        | PostgreSQL port                                     |
+| `DATABASE_URL`   | Hosted database connection string (e.g. Neon); used instead of the `PG_*` values when set |
+| `DATABASE_SSL`   | Set to `false` to connect to a hosted database without SSL (default: SSL with certificate checks) |
+| `TRUST_PROXY`    | Number of proxies in front of the API, `1` on Render (default `0`) |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Admin account created by the seed script (default `admin@poscon.dev` / `admin1234`) |
 | `PORT`           | Port the API listens on (default `9000`)            |
 | `CLIENT_ORIGIN`  | Frontend URL(s) allowed by CORS, comma separated    |
 | `SESSION_SECRET` | Secret used to sign JWTs                            |
@@ -209,11 +215,15 @@ Run these inside `server/`:
 | `npm test`           | Run the API tests                             |
 | `npm run test:coverage` | Run the API tests with a coverage report   |
 
+## Deployment
+
+The app is set up to run on free tiers of [Neon](https://neon.tech) (PostgreSQL), [Render](https://render.com) (API, configured by [`render.yaml`](render.yaml)) and [Vercel](https://vercel.com) (frontend, configured by [`postocom/vercel.json`](postocom/vercel.json)). The API checks itself at `/health`, applies new migrations on start-up and seeds an empty database. Follow the step-by-step [deployment guide](docs/DEPLOYMENT.md).
+
 ## Testing
 
 | Suite | Tool | What it covers | Command |
 | :---- | :--- | :------------- | :------ |
-| API | Jest + Supertest | 93 tests: auth, products and search, cart, orders, payments, admin access, API docs accuracy, plus unit tests for the payment helpers | `cd server && npm test` |
+| API | Jest + Supertest | 95 tests: auth, products and search, cart, orders, payments, admin access, API docs accuracy, plus unit tests for the payment helpers | `cd server && npm test` |
 | Frontend | Jest + React Testing Library | Card helpers, formatting and the product card component | `cd postocom && npm test` |
 | End to end | Playwright | Full journeys in a real browser: sign up, search, cart, checkout, declined and successful payment, order history, admin adding a product and shipping an order, protected pages | `cd e2e && npm test` |
 
@@ -261,6 +271,7 @@ Endpoints marked 🔒 need an `Authorization: Bearer <token>` header, which the 
 | `GET`   | `/home/bestseller`            | Bestselling products                     |
 | `GET`   | `/products`                   | Search and filter products (see below)   |
 | `GET`   | `/products/categories`        | Product categories with product counts   |
+| `GET`   | `/health`                     | Checks the API and database are up       |
 | `GET`   | `/products/:id`               | A single product                         |
 | `GET`   | `/profile` 🔒                 | Logged-in user's profile                 |
 | `GET`   | `/cartdata` 🔒                | Items in the user's cart                 |
@@ -322,14 +333,20 @@ Use any name, any future expiry date and any 3 digit CVV. A declined payment lea
 
 ## Screenshots
 
-### Product Browse
-![Product browse](demo/ProductBrowse.png)
+| | |
+| :-: | :-: |
+| **Browse with filters and sorting** | **Product page** |
+| ![Product browse](demo/ProductBrowse.png) | ![Product details](demo/ItemDetails.png) |
+| **Cart** | **Checkout** |
+| ![Cart](demo/Cart.png) | ![Checkout](demo/CheckoutPage.png) |
+| **Simulated payment** | **Order confirmation** |
+| ![Payment](demo/Payment.png) | ![Order confirmation](demo/OrderConfirmation.png) |
+| **Admin dashboard** | **Admin orders** |
+| ![Admin dashboard](demo/AdminDashboard.png) | ![Admin orders](demo/AdminOrders.png) |
+| **Interactive API docs** | |
+| ![API docs](demo/ApiDocs.png) | |
 
-### Product Details
-![Product details](demo/ItemDetails.png)
-
-### Checkout
-![Checkout](demo/CheckoutPage.png)
+Product images are original illustrations, one per product, created by [`postocom/scripts/generate-product-images.mjs`](postocom/scripts/generate-product-images.mjs). Admins can replace any of them with a photo URL from the product form.
 
 ## Roadmap
 

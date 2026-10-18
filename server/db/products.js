@@ -1,11 +1,8 @@
-const image = (text) =>
-  `https://placehold.co/400x500/f3f4f6/1f2937?text=${encodeURIComponent(text)}`;
-
 const products = [
   {
     namee: "Slim Fit Oxford Shirt",
     description: "Classic white oxford cotton shirt with a button-down collar.",
-    img: image("Slim Fit Oxford Shirt"),
+    img: "/products/slim-fit-oxford-shirt.svg",
     price: 1499,
     sellprice: 899,
     gender: "men",
@@ -15,7 +12,7 @@ const products = [
   {
     namee: "Checked Flannel Shirt",
     description: "Soft brushed flannel in a red and navy check.",
-    img: image("Checked Flannel Shirt"),
+    img: "/products/checked-flannel-shirt.svg",
     price: 1799,
     sellprice: 1199,
     gender: "men",
@@ -24,7 +21,7 @@ const products = [
   {
     namee: "Linen Blend Casual Shirt",
     description: "Breathable linen blend shirt for warm days, olive green.",
-    img: image("Linen Blend Casual Shirt"),
+    img: "/products/linen-blend-casual-shirt.svg",
     price: 1999,
     sellprice: 1299,
     gender: "men",
@@ -33,7 +30,7 @@ const products = [
   {
     namee: "Denim Utility Shirt",
     description: "Mid-wash denim shirt with twin chest pockets.",
-    img: image("Denim Utility Shirt"),
+    img: "/products/denim-utility-shirt.svg",
     price: 2199,
     sellprice: 1499,
     gender: "men",
@@ -42,7 +39,7 @@ const products = [
   {
     namee: "Essential Crew Neck T-Shirt",
     description: "Everyday 100% cotton tee in charcoal grey.",
-    img: image("Essential Crew Neck T-Shirt"),
+    img: "/products/essential-crew-neck-t-shirt.svg",
     price: 699,
     sellprice: 399,
     gender: "men",
@@ -52,7 +49,7 @@ const products = [
   {
     namee: "Graphic Print T-Shirt",
     description: "Relaxed fit tee with a retro graphic print.",
-    img: image("Graphic Print T-Shirt"),
+    img: "/products/graphic-print-t-shirt.svg",
     price: 799,
     sellprice: 499,
     gender: "men",
@@ -61,7 +58,7 @@ const products = [
   {
     namee: "Polo T-Shirt",
     description: "Pique cotton polo with ribbed collar, navy blue.",
-    img: image("Polo T-Shirt"),
+    img: "/products/polo-t-shirt.svg",
     price: 1199,
     sellprice: 749,
     gender: "men",
@@ -70,7 +67,7 @@ const products = [
   {
     namee: "Slim Tapered Jeans",
     description: "Stretch denim jeans in a dark indigo wash.",
-    img: image("Slim Tapered Jeans"),
+    img: "/products/slim-tapered-jeans.svg",
     price: 2499,
     sellprice: 1599,
     gender: "men",
@@ -80,7 +77,7 @@ const products = [
   {
     namee: "Relaxed Fit Jeans",
     description: "Light wash relaxed jeans with a straight leg.",
-    img: image("Relaxed Fit Jeans"),
+    img: "/products/relaxed-fit-jeans.svg",
     price: 2299,
     sellprice: 1399,
     gender: "men",
@@ -89,7 +86,7 @@ const products = [
   {
     namee: "Chino Trousers",
     description: "Cotton twill chinos in beige, slim fit.",
-    img: image("Chino Trousers"),
+    img: "/products/chino-trousers.svg",
     price: 1899,
     sellprice: 1199,
     gender: "men",
@@ -98,7 +95,7 @@ const products = [
   {
     namee: "Cotton Kurta",
     description: "Straight cut cotton kurta in sky blue.",
-    img: image("Cotton Kurta"),
+    img: "/products/cotton-kurta.svg",
     price: 1599,
     sellprice: 999,
     gender: "men",
@@ -107,7 +104,7 @@ const products = [
   {
     namee: "Hooded Sweatshirt",
     description: "Fleece lined hoodie with kangaroo pocket, black.",
-    img: image("Hooded Sweatshirt"),
+    img: "/products/hooded-sweatshirt.svg",
     price: 2199,
     sellprice: 1399,
     gender: "men",
@@ -116,7 +113,7 @@ const products = [
   {
     namee: "Bomber Jacket",
     description: "Lightweight bomber jacket in olive.",
-    img: image("Bomber Jacket"),
+    img: "/products/bomber-jacket.svg",
     price: 3499,
     sellprice: 2299,
     gender: "men",
@@ -126,7 +123,7 @@ const products = [
   {
     namee: "Leather Belt",
     description: "Genuine leather belt with a brushed metal buckle.",
-    img: image("Leather Belt"),
+    img: "/products/leather-belt.svg",
     price: 999,
     sellprice: 599,
     gender: "men",
@@ -135,7 +132,7 @@ const products = [
   {
     namee: "Analog Wrist Watch",
     description: "Minimal analog watch with a brown leather strap.",
-    img: image("Analog Wrist Watch"),
+    img: "/products/analog-wrist-watch.svg",
     price: 3999,
     sellprice: 2499,
     gender: "men",
@@ -145,7 +142,7 @@ const products = [
   {
     namee: "Canvas Backpack",
     description: "Water resistant canvas backpack with laptop sleeve.",
-    img: image("Canvas Backpack"),
+    img: "/products/canvas-backpack.svg",
     price: 2499,
     sellprice: 1699,
     gender: "men",
@@ -154,7 +151,7 @@ const products = [
   {
     namee: "Aviator Sunglasses",
     description: "UV protected aviator sunglasses, gold frame.",
-    img: image("Aviator Sunglasses"),
+    img: "/products/aviator-sunglasses.svg",
     price: 1499,
     sellprice: 899,
     gender: "men",
@@ -163,7 +160,7 @@ const products = [
   {
     namee: "Floral Maxi Dress",
     description: "Flowing maxi dress with a soft floral print.",
-    img: image("Floral Maxi Dress"),
+    img: "/products/floral-maxi-dress.svg",
     price: 2499,
     sellprice: 1599,
     gender: "women",
@@ -173,7 +170,7 @@ const products = [
   {
     namee: "Wrap Midi Dress",
     description: "Solid wrap midi dress in emerald green.",
-    img: image("Wrap Midi Dress"),
+    img: "/products/wrap-midi-dress.svg",
     price: 2299,
     sellprice: 1499,
     gender: "women",
@@ -182,7 +179,7 @@ const products = [
   {
     namee: "Shift Dress",
     description: "Easy fit cotton shift dress in mustard yellow.",
-    img: image("Shift Dress"),
+    img: "/products/shift-dress.svg",
     price: 1799,
     sellprice: 1099,
     gender: "women",
@@ -191,7 +188,7 @@ const products = [
   {
     namee: "Ruffle Sleeve Top",
     description: "Lightweight top with ruffle sleeves, white.",
-    img: image("Ruffle Sleeve Top"),
+    img: "/products/ruffle-sleeve-top.svg",
     price: 1199,
     sellprice: 699,
     gender: "women",
@@ -200,7 +197,7 @@ const products = [
   {
     namee: "Striped Cotton Top",
     description: "Breton striped top in navy and white.",
-    img: image("Striped Cotton Top"),
+    img: "/products/striped-cotton-top.svg",
     price: 999,
     sellprice: 599,
     gender: "women",
@@ -210,7 +207,7 @@ const products = [
   {
     namee: "Satin Blouse",
     description: "Satin finish blouse with a relaxed fit, blush pink.",
-    img: image("Satin Blouse"),
+    img: "/products/satin-blouse.svg",
     price: 1599,
     sellprice: 999,
     gender: "women",
@@ -219,7 +216,7 @@ const products = [
   {
     namee: "High Rise Skinny Jeans",
     description: "Stretch skinny jeans in a mid blue wash.",
-    img: image("High Rise Skinny Jeans"),
+    img: "/products/high-rise-skinny-jeans.svg",
     price: 2299,
     sellprice: 1399,
     gender: "women",
@@ -228,7 +225,7 @@ const products = [
   {
     namee: "Wide Leg Jeans",
     description: "Wide leg high waist jeans in light blue.",
-    img: image("Wide Leg Jeans"),
+    img: "/products/wide-leg-jeans.svg",
     price: 2499,
     sellprice: 1599,
     gender: "women",
@@ -237,7 +234,7 @@ const products = [
   {
     namee: "Printed Anarkali Kurta",
     description: "Flared anarkali kurta with block print detail.",
-    img: image("Printed Anarkali Kurta"),
+    img: "/products/printed-anarkali-kurta.svg",
     price: 2799,
     sellprice: 1799,
     gender: "women",
@@ -247,7 +244,7 @@ const products = [
   {
     namee: "Straight Cotton Kurta",
     description: "Everyday straight kurta in indigo.",
-    img: image("Straight Cotton Kurta"),
+    img: "/products/straight-cotton-kurta.svg",
     price: 1499,
     sellprice: 899,
     gender: "women",
@@ -256,7 +253,7 @@ const products = [
   {
     namee: "Palazzo Pants",
     description: "Flowy palazzo pants in black.",
-    img: image("Palazzo Pants"),
+    img: "/products/palazzo-pants.svg",
     price: 1199,
     sellprice: 699,
     gender: "women",
@@ -265,7 +262,7 @@ const products = [
   {
     namee: "Knit Cardigan",
     description: "Soft knit cardigan with button front, beige.",
-    img: image("Knit Cardigan"),
+    img: "/products/knit-cardigan.svg",
     price: 1999,
     sellprice: 1299,
     gender: "women",
@@ -274,7 +271,7 @@ const products = [
   {
     namee: "Denim Jacket",
     description: "Classic denim jacket in a vintage wash.",
-    img: image("Denim Jacket"),
+    img: "/products/denim-jacket.svg",
     price: 2999,
     sellprice: 1999,
     gender: "women",
@@ -283,7 +280,7 @@ const products = [
   {
     namee: "Leather Tote Bag",
     description: "Structured tote bag with inner zip pocket, tan.",
-    img: image("Leather Tote Bag"),
+    img: "/products/leather-tote-bag.svg",
     price: 3499,
     sellprice: 2199,
     gender: "women",
@@ -293,7 +290,7 @@ const products = [
   {
     namee: "Gold Tone Hoop Earrings",
     description: "Lightweight hoop earrings with a polished finish.",
-    img: image("Gold Tone Hoop Earrings"),
+    img: "/products/gold-tone-hoop-earrings.svg",
     price: 799,
     sellprice: 449,
     gender: "women",
@@ -302,7 +299,7 @@ const products = [
   {
     namee: "Silk Scarf",
     description: "Printed silk scarf with paisley pattern.",
-    img: image("Silk Scarf"),
+    img: "/products/silk-scarf.svg",
     price: 1299,
     sellprice: 799,
     gender: "women",
@@ -311,7 +308,7 @@ const products = [
   {
     namee: "Cat Eye Sunglasses",
     description: "UV protected cat eye sunglasses, black frame.",
-    img: image("Cat Eye Sunglasses"),
+    img: "/products/cat-eye-sunglasses.svg",
     price: 1499,
     sellprice: 899,
     gender: "women",
@@ -320,7 +317,7 @@ const products = [
   {
     namee: "Rose Gold Watch",
     description: "Slim watch with a rose gold mesh strap.",
-    img: image("Rose Gold Watch"),
+    img: "/products/rose-gold-watch.svg",
     price: 4499,
     sellprice: 2799,
     gender: "women",

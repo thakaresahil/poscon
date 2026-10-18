@@ -94,7 +94,14 @@ export const productSchema = z
   .object({
     namee: z.string().trim().min(2, "Product name is required").max(255),
     description: z.string().trim().max(2000).default(""),
-    img: z.string().trim().url("Image must be a valid URL").max(2000),
+    img: z
+      .string()
+      .trim()
+      .max(2000)
+      .refine(
+        (value) => /^https?:\/\/\S+$/.test(value) || /^\/[\w./-]+$/.test(value),
+        "Image must be a full URL or a path like /products/shirt.svg"
+      ),
     price: z.coerce.number().int("Price must be a whole number").min(1, "Price must be at least ₹1"),
     sellprice: z.coerce.number().int("Sale price must be a whole number").min(1, "Sale price must be at least ₹1"),
     gender: z.enum(["men", "women"], { message: "Gender must be men or women" }),

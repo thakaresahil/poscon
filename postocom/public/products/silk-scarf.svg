@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+<defs><pattern id="paisley" width="56" height="56" patternUnits="userSpaceOnUse"><rect width="56" height="56" fill="#0f766e"/><path d="M14 30 q-8 -14 6 -20 q10 -2 8 10 q-2 8 -14 10 z" fill="#f97316"/><circle cx="18" cy="18" r="2.5" fill="#fde68a"/><path d="M42 54 q-8 -14 6 -20 q10 -2 8 10 q-2 8 -14 10 z" fill="#fde68a"/><circle cx="46" cy="42" r="2.5" fill="#f97316"/></pattern></defs>
+<rect width="400" height="500" fill="#cfe4e2"/>
+
+<ellipse cx="200" cy="448" rx="120" ry="12" fill="#000" opacity="0.07"/>
+<path d="M200,62 L330,200 L200,338 L70,200 Z" fill="url(#paisley)" stroke="#0b534d" stroke-width="2"/>
+<path d="M200,82 L310,200 L200,318 L90,200 Z" fill="none" stroke="#f97316" stroke-width="6"/>
+<path d="M200,338 Q170,380 150,436 L186,440 Q196,392 214,352 Z" fill="url(#paisley)" stroke="#0b534d" stroke-width="2"/>
+<path d="M200,338 Q236,384 262,430 L228,440 Q212,394 194,350 Z" fill="url(#paisley)" stroke="#0b534d" stroke-width="2"/>
+<circle cx="200" cy="338" r="16" fill="#0d6861"/>
+</svg>

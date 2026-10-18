@@ -78,6 +78,13 @@ describe("profile", () => {
   });
 });
 
+describe("health check", () => {
+  test("reports the API and database are up", async () => {
+    const response = await api().get("/health").expect(200);
+    expect(response.body).toEqual({ status: "ok" });
+  });
+});
+
 describe("security headers", () => {
   test("allows the configured frontend origin only", async () => {
     const allowed = await api().get("/data").set("Origin", "http://localhost:3000");

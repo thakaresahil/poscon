@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+<defs></defs>
+<rect width="400" height="500" fill="#ece4da"/>
+
+<ellipse cx="200" cy="448" rx="80" ry="12" fill="#000" opacity="0.07"/>
+<rect x="168" y="50" width="64" height="400" rx="16" fill="#7c4a26" stroke="#57341b" stroke-width="2"/>
+<path d="M176,60 L176,170 M224,60 L224,170 M176,330 L176,440 M224,330 L224,440" fill="none" stroke="#aa8972" stroke-width="1.6" stroke-dasharray="5 4" stroke-linecap="round"/>
+<circle cx="200" cy="250" r="78" fill="#c0c4cc" stroke="#86898f" stroke-width="2"/>
+<circle cx="200" cy="250" r="66" fill="#fdfcf7"/>
+<line x1="200.0" y1="200.0" x2="200.0" y2="190.0" stroke="#1f2937" stroke-width="4" stroke-linecap="round"/><line x1="227.5" y1="202.4" x2="230.0" y2="198.0" stroke="#1f2937" stroke-width="2" stroke-linecap="round"/><line x1="247.6" y1="222.5" x2="252.0" y2="220.0" stroke="#1f2937" stroke-width="2" stroke-linecap="round"/><line x1="250.0" y1="250.0" x2="260.0" y2="250.0" stroke="#1f2937" stroke-width="4" stroke-linecap="round"/><line x1="247.6" y1="277.5" x2="252.0" y2="280.0" stroke="#1f2937" stroke-width="2" stroke-linecap="round"/><line x1="227.5" y1="297.6" x2="230.0" y2="302.0" stroke="#1f2937" stroke-width="2" stroke-linecap="round"/><line x1="200.0" y1="300.0" x2="200.0" y2="310.0" stroke="#1f2937" stroke-width="4" stroke-linecap="round"/><line x1="172.5" y1="297.6" x2="170.0" y2="302.0" stroke="#1f2937" stroke-width="2" stroke-linecap="round"/><line x1="152.4" y1="277.5" x2="148.0" y2="280.0" stroke="#1f2937" stroke-width="2" stroke-linecap="round"/><line x1="150.0" y1="250.0" x2="140.0" y2="250.0" stroke="#1f2937" stroke-width="4" stroke-linecap="round"/><line x1="152.4" y1="222.5" x2="148.0" y2="220.0" stroke="#1f2937" stroke-width="2" stroke-linecap="round"/><line x1="172.5" y1="202.4" x2="170.0" y2="198.0" stroke="#1f2937" stroke-width="2" stroke-linecap="round"/>
+<line x1="200" y1="250" x2="200" y2="206" stroke="#1f2937" stroke-width="5" stroke-linecap="round"/>
+<line x1="200" y1="250" x2="234" y2="268" stroke="#1f2937" stroke-width="4" stroke-linecap="round"/>
+<line x1="200" y1="250" x2="176" y2="292" stroke="#dc2626" stroke-width="1.6"/>
+<circle cx="200" cy="250" r="5" fill="#c0c4cc"/>
+<rect x="276" y="242" width="12" height="16" rx="3" fill="#c0c4cc" stroke="#86898f" stroke-width="1.5"/>
+</svg>
