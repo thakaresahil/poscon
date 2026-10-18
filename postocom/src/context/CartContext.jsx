@@ -50,9 +50,10 @@ export function CartProvider({ children }) {
     setItems((current) => current.filter((item) => item.id !== cartId));
   };
 
-  const checkout = async () => {
-    await api.patch("/buyitem", { pid: items.map((item) => item.product_id) });
+  const placeOrder = async (shipping) => {
+    const response = await api.post("/orders", shipping);
     setItems([]);
+    return response.data;
   };
 
   const count = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -67,7 +68,7 @@ export function CartProvider({ children }) {
     addItem,
     updateQuantity,
     removeItem,
-    checkout,
+    placeOrder,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

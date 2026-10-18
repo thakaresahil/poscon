@@ -45,6 +45,7 @@ function Navbar() {
           <NavLink to="/">Home</NavLink>
           <NavLink to="/contact">Contact</NavLink>
           <NavLink to="/about">About</NavLink>
+          {loginstatus ? <NavLink to="/orders">My Orders</NavLink> : null}
           {!loginstatus ? (
             <button onClick={handleLoginComponent}>Log In</button>
           ) : (
@@ -166,6 +167,17 @@ function Navbar() {
                       >
                         Profile
                       </button>
+                    </li>
+                  ) : null}
+                  {loginstatus ? (
+                    <li>
+                      <NavLink
+                        to="/orders"
+                        onClick={() => setIsOpen(false)}
+                        className="block py-2 px-4 text-gray-900 rounded hover:bg-gray-100"
+                      >
+                        My Orders
+                      </NavLink>
                     </li>
                   ) : null}
                   {loginstatus ? (

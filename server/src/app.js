@@ -6,6 +6,7 @@ import productRoutes from "./routes/productRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 import { errorHandler, notFound } from "./middleware/errorHandler.js";
 
 const app = express();
@@ -18,6 +19,7 @@ app.use(productRoutes);
 app.use(authRoutes);
 app.use(cartRoutes);
 app.use(profileRoutes);
+app.use(orderRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
