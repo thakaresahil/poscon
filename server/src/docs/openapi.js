@@ -126,6 +126,57 @@ const openapi = {
           404: responses.NotFound,
         },
       },
+      patch: {
+        tags: ["Auth"],
+        summary: "Update name, phone number and saved delivery address",
+        description: "Replaces the saved details: optional fields that are left out or empty are cleared. The email cannot be changed.",
+        security: loggedIn,
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: ref("ProfileUpdate"),
+              example: { name: "Demo User", pnum: "9999999999", address: "221B Linking Road, Bandra West", city: "Mumbai", pincode: "400050" },
+            },
+          },
+        },
+        responses: {
+          200: json(ref("Profile"), "Profile updated"),
+          400: responses.BadRequest,
+          401: responses.Unauthorized,
+          404: responses.NotFound,
+          409: errorResponse("The phone number belongs to another account", "This phone number is already used by another account"),
+        },
+      },
+    },
+    "/profile/password": {
+      patch: {
+        tags: ["Auth"],
+        summary: "Change the password",
+        security: loggedIn,
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["currentPassword", "newPassword"],
+                properties: {
+                  currentPassword: { type: "string" },
+                  newPassword: { type: "string", minLength: 8, maxLength: 72 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: json({ type: "object", properties: { status: { type: "string", example: "Password changed" } } }),
+          400: errorResponse("Wrong current password or invalid new password", "Current password is incorrect"),
+          401: responses.Unauthorized,
+          404: responses.NotFound,
+          429: { $ref: "#/components/responses/TooManyRequests" },
+        },
+      },
     },
     "/data": {
       get: {
@@ -634,6 +685,8 @@ const openapi = {
           email: { type: "string" },
           pnum: { type: "string", nullable: true },
           address: { type: "string", nullable: true },
+          city: { type: "string", nullable: true },
+          pincode: { type: "string", nullable: true },
           is_admin: { type: "boolean" },
         },
       },
@@ -823,6 +876,17 @@ const openapi = {
           },
         ],
         discriminator: { propertyName: "method" },
+      },
+      ProfileUpdate: {
+        type: "object",
+        required: ["pnum"],
+        properties: {
+          name: { type: "string", maxLength: 100 },
+          pnum: { type: "string", pattern: "^\\d{10}$" },
+          address: { type: "string", maxLength: 255 },
+          city: { type: "string", maxLength: 100 },
+          pincode: { type: "string", description: "6 digits, or empty to clear" },
+        },
       },
       ContactRequest: {
         type: "object",

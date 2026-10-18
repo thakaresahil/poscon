@@ -148,3 +148,36 @@ export const messageQuerySchema = z.object({
 export const messageStatusSchema = z.object({
   status: z.enum(["new", "read"], { message: "Status must be new or read" }),
 });
+
+// Empty strings clear optional profile fields
+const optionalText = (max, message) =>
+  z
+    .string()
+    .trim()
+    .max(max, message)
+    .transform((value) => value || null)
+    .nullable()
+    .optional();
+
+export const profileSchema = z.object({
+  name: optionalText(100, "Name can be up to 100 characters"),
+  pnum: z.string().trim().regex(/^\d{10}$/, "Phone number must be 10 digits"),
+  address: optionalText(255, "Address can be up to 255 characters"),
+  city: optionalText(100, "City can be up to 100 characters"),
+  pincode: z
+    .string()
+    .trim()
+    .refine((value) => value === "" || /^\d{6}$/.test(value), "Pincode must be 6 digits")
+    .transform((value) => value || null)
+    .nullable()
+    .optional(),
+});
+
+export const passwordChangeSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Please enter your current password"),
+    newPassword: z.string().min(8, "New password must be at least 8 characters").max(72),
+  })
+  .refine((body) => body.currentPassword !== body.newPassword, {
+    message: "New password must be different from the current one",
+  });

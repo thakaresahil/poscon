@@ -7,7 +7,9 @@ const demoUser = {
   email: "demo@poscon.dev",
   pnum: "9999999999",
   password: "demo1234",
-  address: "221B Baker Street, Mumbai",
+  address: "221B Linking Road, Bandra West",
+  city: "Mumbai",
+  pincode: "400050",
 };
 
 // On a public deployment set ADMIN_PASSWORD so the admin account is not the documented demo one
@@ -58,8 +60,8 @@ async function seed() {
 
     const passhash = await bcrypt.hash(demoUser.password, 10);
     await db.query(
-      "INSERT INTO users (name, email, pnum, passhash, address) VALUES ($1, $2, $3, $4, $5)",
-      [demoUser.name, demoUser.email, demoUser.pnum, passhash, demoUser.address]
+      "INSERT INTO users (name, email, pnum, passhash, address, city, pincode) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+      [demoUser.name, demoUser.email, demoUser.pnum, passhash, demoUser.address, demoUser.city, demoUser.pincode]
     );
 
     const adminPasshash = await bcrypt.hash(adminUser.password, 10);
