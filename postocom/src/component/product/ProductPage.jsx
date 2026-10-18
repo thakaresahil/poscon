@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 import Detailedview from "../detailed/Detailedview";
 import Loading from "../loading/Loading";
 import NotFound from "../notfound/NotFound";
@@ -10,6 +11,7 @@ function ProductPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isLoggedIn, openLogin } = useAuth();
+  const { addItem } = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [cartError, setCartError] = useState("");
@@ -36,7 +38,7 @@ function ProductPage() {
     }
     setCartError("");
     try {
-      await api.post("/addtocart", { pid, count });
+      await addItem(pid, count);
       navigate("/cart");
     } catch (error) {
       setCartError(error.response?.data?.error || "Could not add to cart, please try again.");
