@@ -5,7 +5,7 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
-  // null, "login" or "register"
+  // null, "login", "register" or "forgot"
   const [authDialog, setAuthDialog] = useState(null);
   // Only used to show admin pages; the API checks admin access on every request
   const [isAdmin, setIsAdmin] = useState(false);
@@ -57,6 +57,7 @@ export function AuthProvider({ children }) {
     authDialog,
     openLogin: () => setAuthDialog("login"),
     openRegister: () => setAuthDialog("register"),
+    openForgotPassword: () => setAuthDialog("forgot"),
     closeAuthDialog: () => setAuthDialog(null),
   };
 

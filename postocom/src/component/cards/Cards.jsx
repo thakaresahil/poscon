@@ -3,24 +3,31 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
 function Cards(props) {
- 
   const truncatedName =
     props.name.length > 50 ? props.name.substring(0, 48) + "..." : props.name;
-
-    const discPercents = Math.floor(((props.orgprice - props.sellprice) / props.orgprice) * 100);
+  const discPercents = Math.floor(((props.orgprice - props.sellprice) / props.orgprice) * 100);
 
   return (
     <Link
       to={`/product/${props.id}`}
-      className="w-64 h-96 flex flex-col justify-items-center items-center gap-2 bg-gray-50 p-6 pt-0 transform transition-transform duration-300 hover:scale-105"
+      className="group card flex flex-col overflow-hidden transition-shadow hover:shadow-lg"
     >
-      <img className="w-52" src={props.img} alt={props.name} />
-      <p className="w-full text-center">{truncatedName}</p>
-      <p>
-         <span className="font-semibold ">At ₹{props.sellprice}</span>{' '}
-        <span className="text-gray-300 line-through font-thin text-sm">₹{props.orgprice}</span>
-        <span className="text-red-400 ">({discPercents}% OFF)</span>
-      </p>
+      <div className="aspect-[4/5] overflow-hidden bg-gray-50">
+        <img
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          src={props.img}
+          alt={props.name}
+          loading="lazy"
+        />
+      </div>
+      <div className="flex flex-1 flex-col gap-1 p-3">
+        <p className="text-sm text-gray-800 group-hover:text-red-600 sm:text-base">{truncatedName}</p>
+        <p className="mt-auto flex flex-wrap items-baseline gap-x-2">
+          <span className="price">At ₹{props.sellprice}</span>
+          <span className="price-old">₹{props.orgprice}</span>
+          {discPercents > 0 && <span className="discount">({discPercents}% OFF)</span>}
+        </p>
+      </div>
     </Link>
   );
 }

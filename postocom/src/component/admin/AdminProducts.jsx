@@ -58,17 +58,17 @@ function AdminProducts() {
             type="search"
             name="adminSearch"
             placeholder="Search products"
-            className="border rounded p-2 w-64"
+            className="input w-64"
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
           />
-          <button type="submit" className="px-4 py-2 border rounded">
+          <button type="submit" className="btn btn-secondary">
             Search
           </button>
         </form>
         <Link
           to="/admin/products/new"
-          className="px-6 py-2 bg-red-500 text-white rounded-md text-center transition-transform duration-300 hover:scale-105"
+          className="btn btn-primary"
         >
           Add Product
         </Link>
@@ -112,7 +112,7 @@ function AdminProducts() {
                   <td className="py-2 text-right whitespace-nowrap">
                     <Link
                       to={`/admin/products/${product.id}/edit`}
-                      className="text-blue-600 hover:underline mr-4"
+                      className="link mr-4"
                     >
                       Edit
                     </Link>
@@ -129,14 +129,14 @@ function AdminProducts() {
 
       {result && result.totalPages > 1 && (
         <nav className="flex justify-center items-center gap-2" aria-label="Pagination">
-          <button className="px-3 py-1 border rounded disabled:text-gray-300" disabled={page <= 1} onClick={() => goToPage(page - 1)}>
+          <button className="btn btn-secondary btn-sm" disabled={page <= 1} onClick={() => goToPage(page - 1)}>
             Previous
           </button>
           <span className="text-gray-500">
             Page {page} of {result.totalPages}
           </span>
           <button
-            className="px-3 py-1 border rounded disabled:text-gray-300"
+            className="btn btn-secondary btn-sm"
             disabled={page >= result.totalPages}
             onClick={() => goToPage(page + 1)}
           >

@@ -33,7 +33,7 @@ function Profile() {
             <p>Phone number: {pdata.pnum}</p> 
             <p>Email: {pdata.email}</p>
             <p>Address: {pdata.address}</p> 
-            <Link to="/orders" className="text-blue-600 hover:underline">View my orders</Link>
+            <Link to="/orders" className="link">View my orders</Link>
     </div>
 ):null}
     </div>

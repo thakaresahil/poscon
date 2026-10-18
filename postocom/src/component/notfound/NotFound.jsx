@@ -7,7 +7,7 @@ function NotFound() {
       <p className="text-xl">Sorry, we couldn't find that page.</p>
       <NavLink
         to="/"
-        className="px-6 py-2 bg-red-500 text-white rounded-md transition-transform duration-300 hover:scale-105"
+        className="btn btn-primary"
       >
         Back to Home
       </NavLink>

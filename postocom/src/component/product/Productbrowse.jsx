@@ -159,7 +159,7 @@ function Productbrowse() {
               min="0"
               name="minPrice"
               placeholder="Min"
-              className="border rounded p-2 w-full"
+              className="input"
               value={priceInput.min}
               onChange={(event) => setPriceInput({ ...priceInput, min: event.target.value })}
             />
@@ -168,18 +168,18 @@ function Productbrowse() {
               min="0"
               name="maxPrice"
               placeholder="Max"
-              className="border rounded p-2 w-full"
+              className="input"
               value={priceInput.max}
               onChange={(event) => setPriceInput({ ...priceInput, max: event.target.value })}
             />
           </div>
-          <button type="submit" className="py-2 rounded bg-red-500 text-white hover:bg-red-600">
+          <button type="submit" className="btn btn-primary">
             Apply
           </button>
         </form>
 
         {hasFilters && (
-          <button className="text-blue-600 hover:underline text-left" onClick={clearFilters}>
+          <button className="link text-left" onClick={clearFilters}>
             Clear all filters
           </button>
         )}
@@ -198,7 +198,7 @@ function Productbrowse() {
           <label className="flex items-center gap-2">
             <span className="text-gray-500">Sort by</span>
             <select
-              className="block border border-grey-light py-2 px-4 rounded"
+              className="input w-auto"
               name="sort"
               value={sort}
               onChange={(event) => updateParams({ sort: event.target.value })}
@@ -221,7 +221,7 @@ function Productbrowse() {
           <div className="flex flex-col items-center gap-4 my-12">
             <p className="text-xl">No products match your search.</p>
             <button
-              className="px-6 py-2 bg-red-500 text-white rounded-md transition-transform duration-300 hover:scale-105"
+              className="btn btn-primary"
               onClick={clearFilters}
             >
               Clear Filters
@@ -245,7 +245,7 @@ function Productbrowse() {
         {!loading && result.totalPages > 1 && (
           <nav className="flex justify-center items-center gap-2" aria-label="Pagination">
             <button
-              className="px-3 py-1 border rounded disabled:text-gray-300"
+              className="btn btn-secondary btn-sm"
               disabled={page <= 1}
               onClick={() => updateParams({ page: page - 1 })}
             >
@@ -264,7 +264,7 @@ function Productbrowse() {
               </button>
             ))}
             <button
-              className="px-3 py-1 border rounded disabled:text-gray-300"
+              className="btn btn-secondary btn-sm"
               disabled={page >= result.totalPages}
               onClick={() => updateParams({ page: page + 1 })}
             >

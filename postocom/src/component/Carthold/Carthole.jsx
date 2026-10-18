@@ -37,7 +37,7 @@ function Carthole() {
         <p className="text-gray-500">Looks like you haven't added anything yet.</p>
         <NavLink
           to="/browseproduct"
-          className="px-6 py-2 bg-red-500 text-white rounded-md transition-transform duration-300 hover:scale-105"
+          className="btn btn-primary"
         >
           Continue Shopping
         </NavLink>
@@ -72,7 +72,7 @@ function Carthole() {
           Sub Total ({count} {count === 1 ? "item" : "items"}): ₹{total}
         </p>
         <button
-          className="px-6 py-2 bg-red-500 text-white rounded-md transition-transform duration-300 hover:scale-105"
+          className="btn btn-primary"
           onClick={handleChechout}
         >
           Checkout

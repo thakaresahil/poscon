@@ -84,7 +84,7 @@ function OrderDetail() {
           </p>
           <Link
             to={`/orders/${order.id}/pay`}
-            className="px-6 py-2 bg-red-500 text-white rounded-md transition-transform duration-300 hover:scale-105"
+            className="btn btn-primary"
           >
             Pay Now
           </Link>
@@ -146,7 +146,7 @@ function OrderDetail() {
         </div>
       )}
 
-      <Link to="/orders" className="text-blue-600 hover:underline">
+      <Link to="/orders" className="link">
         ← Back to My Orders
       </Link>
     </div>

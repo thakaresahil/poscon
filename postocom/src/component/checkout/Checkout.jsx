@@ -4,8 +4,7 @@ import api from "../../api/client";
 import { useCart } from "../../context/CartContext";
 import Loading from "../loading/Loading";
 
-const inputClass =
-  "block border border-grey-light w-full p-3 rounded mb-4 hover:shadow-lg font-medium transition transform hover:-translate-y-0.5";
+const inputClass = "input mb-4";
 
 function Checkout() {
   const navigate = useNavigate();
@@ -89,7 +88,7 @@ function Checkout() {
         <button
           type="submit"
           disabled={placing}
-          className="w-full text-center py-3 rounded bg-red-500 text-white hover:bg-red-600 focus:outline-none my-1 hover:shadow-lg font-medium transition transform hover:-translate-y-0.5 disabled:opacity-60"
+          className="btn btn-primary w-full"
         >
           {placing ? "Placing Order..." : `Continue to Payment (₹${total})`}
         </button>

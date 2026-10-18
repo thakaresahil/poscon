@@ -80,7 +80,7 @@ function Dashboard() {
             <div className="border rounded p-4">
               <div className="flex justify-between mb-3">
                 <h2 className="font-semibold">Recent Orders</h2>
-                <Link to="/admin/orders" className="text-blue-600 hover:underline text-sm">
+                <Link to="/admin/orders" className="link text-sm">
                   View all
                 </Link>
               </div>

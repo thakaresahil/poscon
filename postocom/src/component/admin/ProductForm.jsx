@@ -5,7 +5,7 @@ import Loading from "../loading/Loading";
 import NotFound from "../notfound/NotFound";
 import AdminLayout from "./AdminLayout";
 
-const inputClass = "block border border-grey-light w-full p-3 rounded";
+const inputClass = "input";
 
 const emptyProduct = {
   namee: "",
@@ -128,11 +128,11 @@ function ProductForm() {
             <button
               type="submit"
               disabled={saving}
-              className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 disabled:opacity-60"
+              className="btn btn-primary"
             >
               {saving ? "Saving..." : isEdit ? "Save Changes" : "Add Product"}
             </button>
-            <button type="button" className="px-6 py-2 border rounded-md" onClick={() => navigate("/admin/products")}>
+            <button type="button" className="btn btn-secondary" onClick={() => navigate("/admin/products")}>
               Cancel
             </button>
           </div>
